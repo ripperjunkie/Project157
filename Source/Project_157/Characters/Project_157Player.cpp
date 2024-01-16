@@ -8,7 +8,6 @@
 
 #include "Camera/CameraComponent.h"
 
-#include "Project_157/Components/Project_157EnterExitVehicleComponent.h"
 
 
 #include "TimerManager.h"
@@ -37,8 +36,7 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 		CameraComponent->SetupAttachment(SpringArmComponent);
 	}
 
-	/* Creating enter exit vehicle component */
-	EnterExitVehicleComponent = CreateDefaultSubobject<UProject_157EnterExitVehicleComponent>(TEXT("EnterExitVehicle Component"));
+
 
 	// Default params for character
 	// Keep character facing forward (to where camera is facing)
@@ -78,7 +76,6 @@ void AProject_157Player::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveRight", this, &ThisClass::Input_MoveRight);
 	PlayerInputComponent->BindAxis("LookRight", this, &ThisClass::Input_LookRight);
 	PlayerInputComponent->BindAxis("LookUp", this, &ThisClass::Input_LookUp);
-	
 	
 }
 

@@ -11,7 +11,6 @@ DECLARE_LOG_CATEGORY_EXTERN(Log_Player, Log, All);
 
 class USpringArmComponent;
 class UCameraComponent;
-class UProject_157EnterExitVehicleComponent;
 
 UCLASS()
 class PROJECT_157_API AProject_157Player : public ACharacter
@@ -37,9 +36,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Default Components")
 	UCameraComponent* CameraComponent;
-	
-	UPROPERTY(BlueprintReadOnly, Category="Default Components")
-	UProject_157EnterExitVehicleComponent* EnterExitVehicleComponent;
+
 #pragma endregion
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

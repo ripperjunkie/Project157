@@ -1,9 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "Project_157Pawn.h"
-#include "Project_157WheelFront.h"
-#include "Project_157WheelRear.h"
-#include "Project_157Hud.h"
+#include "Project_157BaseVehicle.h"
+#include "Components/Project_157WheelFront.h"
+#include "Components/Project_157WheelRear.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -26,14 +25,14 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #endif // HMD_MODULE_INCLUDED
 
-const FName AProject_157Pawn::LookUpBinding("LookUp");
-const FName AProject_157Pawn::LookRightBinding("LookRight");
+const FName AProject_157BaseVehicle::LookUpBinding("LookUp");
+const FName AProject_157BaseVehicle::LookRightBinding("LookRight");
 
 #define LOCTEXT_NAMESPACE "VehiclePawn"
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 
-AProject_157Pawn::AProject_157Pawn()
+AProject_157BaseVehicle::AProject_157BaseVehicle()
 {
 	// Car mesh
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/Vehicle/Sedan/Sedan_SkelMesh.Sedan_SkelMesh"));
@@ -87,46 +86,46 @@ AProject_157Pawn::AProject_157Pawn()
 	bInReverseGear = false;
 }
 
-void AProject_157Pawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void AProject_157BaseVehicle::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AProject_157Pawn::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AProject_157Pawn::MoveRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &AProject_157BaseVehicle::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AProject_157BaseVehicle::MoveRight);
 	PlayerInputComponent->BindAxis("LookUp");
 	PlayerInputComponent->BindAxis("LookRight");
 
-	PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &AProject_157Pawn::OnHandbrakePressed);
-	PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &AProject_157Pawn::OnHandbrakeReleased);
+	PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &AProject_157BaseVehicle::OnHandbrakePressed);
+	PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &AProject_157BaseVehicle::OnHandbrakeReleased);
 
 }
 
-void AProject_157Pawn::MoveForward(float Val)
+void AProject_157BaseVehicle::MoveForward(float Val)
 {
 	GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
-void AProject_157Pawn::MoveRight(float Val)
+void AProject_157BaseVehicle::MoveRight(float Val)
 {
 	GetVehicleMovementComponent()->SetSteeringInput(Val);
 }
 
-void AProject_157Pawn::OnHandbrakePressed()
+void AProject_157BaseVehicle::OnHandbrakePressed()
 {
 	GetVehicleMovementComponent()->SetHandbrakeInput(true);
 }
 
-void AProject_157Pawn::OnHandbrakeReleased()
+void AProject_157BaseVehicle::OnHandbrakeReleased()
 {
 	GetVehicleMovementComponent()->SetHandbrakeInput(false);
 }
 
 
 
-void AProject_157Pawn::Tick(float Delta)
+void AProject_157BaseVehicle::Tick(float Delta)
 {
 	Super::Tick(Delta);
 
@@ -135,7 +134,22 @@ void AProject_157Pawn::Tick(float Delta)
 	
 }
 
-void AProject_157Pawn::BeginPlay()
+void AProject_157BaseVehicle::RequestEnterVehicle_Implementation(AActor* ActorRequested)
+{
+	IProject_157VehicleInterface::RequestEnterVehicle_Implementation(ActorRequested);
+	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
+
+	// TODO: Enter vehicle, check if it's controlled pawn by a human, then possess this vehicle.
+	if(AController* controller = Cast<AController>(ActorRequested))
+	{
+		if(controller->IsPlayerController())
+		{
+			controller->Possess(this);
+		}
+	}
+}
+
+void AProject_157BaseVehicle::BeginPlay()
 {
 	Super::BeginPlay();
 } 
