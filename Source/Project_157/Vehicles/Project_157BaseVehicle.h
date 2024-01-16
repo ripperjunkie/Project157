@@ -19,6 +19,8 @@ class AProject_157BaseVehicle : public AWheeledVehicle, public IProject_157Vehic
 	GENERATED_BODY()
 
 public:
+	AProject_157BaseVehicle();
+	
 	/** Spring arm that will offset the camera */
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArm;
@@ -27,7 +29,6 @@ public:
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
 	
-	AProject_157BaseVehicle();
 	/** Are we in reverse gear */
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly)
 	bool bInReverseGear;
@@ -59,14 +60,15 @@ public:
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
 
 #pragma region Inherited Interfaces
+	
 	virtual void RequestEnterVehicle_Implementation(AActor* ActorRequested) override;
 	
-#pragma endregion 
+#pragma endregion
+	
 protected:
 	virtual void BeginPlay() override;
 
 private:
-
 	/* Are we on a 'slippery' surface */
 	bool bIsLowFriction;
 

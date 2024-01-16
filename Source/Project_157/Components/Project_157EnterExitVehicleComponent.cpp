@@ -81,6 +81,7 @@ void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 	
 	if(IProject_157VehicleInterface* interface = Cast<IProject_157VehicleInterface>(vehicle))
 	{
+		// We pass the owner assuming that it's a player controller
 		IProject_157VehicleInterface::Execute_RequestEnterVehicle(vehicle, Cast<AActor>(GetOwner()));
 		UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 	}
@@ -108,7 +109,7 @@ FHitResult UProject_157EnterExitVehicleComponent::CanEnterVehicle()
 	const float radius = OwnerCapsuleComp->GetScaledCapsuleRadius();
 	const float halfHeight = OwnerCapsuleComp->GetScaledCapsuleHalfHeight();
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(static_cast<EObjectTypeQuery>(ECC_Vehicle));
+	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery5);
 	const bool bTraceComplex  = true;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
