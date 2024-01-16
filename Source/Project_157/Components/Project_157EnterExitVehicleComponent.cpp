@@ -18,9 +18,6 @@ UProject_157EnterExitVehicleComponent::UProject_157EnterExitVehicleComponent()
 	// ...
 }
 
-
-
-
 // Called when the game starts
 void UProject_157EnterExitVehicleComponent::BeginPlay()
 {
@@ -40,21 +37,24 @@ void UProject_157EnterExitVehicleComponent::EndPlay(const EEndPlayReason::Type E
 
 void UProject_157EnterExitVehicleComponent::RequestVehicleInteraction()
 {
+	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 	// Check if player is possessing a vehicle or is in vehicle already
 	APlayerController* controller = Cast<APlayerController>(GetOwner());
-	if(!controller)
-		return;
 
+	
 	if(controller->IsPlayerController())
 	{
 		if(ACharacter* possessedCharacter = Cast<ACharacter>(controller->GetPawn()))
 		{
+			// let's store our current possessed character pawn
+			CurrentPossessedCharacter = possessedCharacter;
+			
 			RequestEnterVehicle();
 			UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 			return;
 		}
 	}
-	else if(Cast<IProject_157VehicleInterface>(controller->GetPawn()))
+	if(CurrentPossessedVehicle == controller->GetPawn())
 	{
 		UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 		RequestExitVehicle();
@@ -62,7 +62,7 @@ void UProject_157EnterExitVehicleComponent::RequestVehicleInteraction()
 }
 void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 {	
-	// TODO: Check if character is nearby vehicle to enter
+	// Check if character is nearby vehicle to enter
 	
 	const FHitResult hitResult = CanEnterVehicle();
 	if(!hitResult.bBlockingHit)
@@ -83,6 +83,7 @@ void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 	{
 		// We pass the owner assuming that it's a player controller
 		IProject_157VehicleInterface::Execute_RequestEnterVehicle(vehicle, Cast<AActor>(GetOwner()));
+		CurrentPossessedVehicle = vehicle;
 		UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 	}
 	else
@@ -94,6 +95,14 @@ void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 void UProject_157EnterExitVehicleComponent::RequestExitVehicle()
 {
 	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
+	APlayerController* controller = Cast<APlayerController>(GetOwner());
+
+	if(controller)
+	{
+		controller->Possess(CurrentPossessedCharacter);
+		CurrentPossessedVehicle = nullptr;
+	}
+	
 }
 
 /*

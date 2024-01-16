@@ -45,7 +45,10 @@ protected:
 private:
 	UPROPERTY()
 	UCapsuleComponent* OwnerCapsuleComp;
-	
+	UPROPERTY()
+	ACharacter* CurrentPossessedCharacter;
+	UPROPERTY()
+	AActor* CurrentPossessedVehicle;
 
 public:
 	// // Called every frame
