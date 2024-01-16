@@ -40,7 +40,6 @@ void UProject_157EnterExitVehicleComponent::RequestVehicleInteraction()
 	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 	// Check if player is possessing a vehicle or is in vehicle already
 	APlayerController* controller = Cast<APlayerController>(GetOwner());
-
 	
 	if(controller->IsPlayerController())
 	{
@@ -57,9 +56,11 @@ void UProject_157EnterExitVehicleComponent::RequestVehicleInteraction()
 	if(CurrentPossessedVehicle == controller->GetPawn())
 	{
 		UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
+
 		RequestExitVehicle();
 	}
 }
+
 void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 {	
 	// Check if character is nearby vehicle to enter
@@ -81,9 +82,11 @@ void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 	
 	if(IProject_157VehicleInterface* interface = Cast<IProject_157VehicleInterface>(vehicle))
 	{
-		// We pass the owner assuming that it's a player controller
+		// We pass the owner assuming that it's a player controller	
 		IProject_157VehicleInterface::Execute_RequestEnterVehicle(vehicle, Cast<AActor>(GetOwner()));
+		
 		CurrentPossessedVehicle = vehicle;
+		
 		UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 	}
 	else
@@ -95,14 +98,22 @@ void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 void UProject_157EnterExitVehicleComponent::RequestExitVehicle()
 {
 	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
+	
 	APlayerController* controller = Cast<APlayerController>(GetOwner());
-
-	if(controller)
+	
+	if(!controller)
 	{
-		controller->Possess(CurrentPossessedCharacter);
-		CurrentPossessedVehicle = nullptr;
+		return;
 	}
 	
+	IProject_157VehicleInterface::Execute_RequestExitVehicle(CurrentPossessedVehicle, controller);
+	
+	if(controller)
+	{
+	//	controller->ResetIgnoreMoveInput();
+		controller->Possess(CurrentPossessedCharacter);
+		CurrentPossessedVehicle = nullptr;
+	}	
 }
 
 /*

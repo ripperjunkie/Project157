@@ -25,7 +25,8 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void RequestEnterVehicle(AActor* ActorRequested);
-
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void RequestExitVehicle(AActor* ActorRequested);
 
 public:
 };

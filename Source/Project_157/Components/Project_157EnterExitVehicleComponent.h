@@ -36,11 +36,6 @@ protected:
 	// We process collisions here to keep logic organized
 	UFUNCTION(BlueprintCallable)
 	FHitResult CanEnterVehicle();
-	
-
-
-	UPROPERTY(BlueprintReadOnly)
-	uint8 bInVehicleEnterCollision : 1;
 
 private:
 	UPROPERTY()

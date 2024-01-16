@@ -19,7 +19,7 @@ class AProject_157BaseVehicle : public AWheeledVehicle, public IProject_157Vehic
 	GENERATED_BODY()
 
 public:
-	AProject_157BaseVehicle();
+	AProject_157BaseVehicle(const FObjectInitializer& ObjectInitializer);
 	
 	/** Spring arm that will offset the camera */
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -62,8 +62,15 @@ public:
 #pragma region Inherited Interfaces
 	
 	virtual void RequestEnterVehicle_Implementation(AActor* ActorRequested) override;
-	
+	virtual void RequestExitVehicle_Implementation(AActor* ActorRequested) override;
 #pragma endregion
+
+	// GETTERS
+	UFUNCTION(BlueprintPure, Category=Getters)
+	FORCEINLINE float GetThrottleInput() const
+	{
+		return 0.f;
+	}
 	
 protected:
 	virtual void BeginPlay() override;
