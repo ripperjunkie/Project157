@@ -13,9 +13,7 @@ class UProject_157VehicleInterface : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
+
 class PROJECT_157_API IProject_157VehicleInterface
 {
 	GENERATED_BODY()

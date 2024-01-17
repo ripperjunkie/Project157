@@ -35,15 +35,31 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 	{
 		CameraComponent->SetupAttachment(SpringArmComponent);
 	}
-
-
-
+	
 	// Default params for character
 	// Keep character facing forward (to where camera is facing)
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	bUseControllerRotationYaw = true;
 	GetCharacterMovement()->MaxWalkSpeed = 450.f;
 	
+}
+
+bool AProject_157Player::CheckState(EProject_157ActionState stateToCheck)
+{
+	// check if that particular bit is on or not
+	return (CurrentActionState & static_cast<uint32>(stateToCheck) ) > (static_cast<uint32>(stateToCheck) - 1);
+}
+
+void AProject_157Player::SetCurrentState(EProject_157ActionState state)
+{
+	// turn on that particular bit
+	CurrentActionState |= static_cast<uint32>(state);
+}
+
+void AProject_157Player::ResetState(EProject_157ActionState state)
+{
+	// turn off that particular bit
+	CurrentActionState &= (~static_cast<uint32>(state));
 }
 
 
@@ -129,3 +145,32 @@ void AProject_157Player::Input_LookRight(float Axis)
 	// TODO: Multiply axis by a sensitivity
 	AddControllerYawInput(Axis);
 }
+
+#pragma region IProject_157CharacterInterface Methods
+
+void AProject_157Player::OnChangeInventoryItem_Implementation()
+{
+	IProject_157CharacterInterface::OnChangeInventoryItem_Implementation();
+}
+
+void AProject_157Player::OnShoot_Implementation(FVector& _MuzzleLocation)
+{
+	IProject_157CharacterInterface::OnShoot_Implementation(_MuzzleLocation);
+}
+
+void AProject_157Player::OnShoot_Camera_Implementation(FVector& _MuzzleLocation, FVector& Direction)
+{
+	IProject_157CharacterInterface::OnShoot_Camera_Implementation(_MuzzleLocation, Direction);
+}
+
+void AProject_157Player::TakeDamage_Implementation(float _Damage, AActor* DamageCauser)
+{
+	IProject_157CharacterInterface::TakeDamage_Implementation(_Damage, DamageCauser);
+}
+
+void AProject_157Player::AddItem_Implementation(TSubclassOf<UProject_157ItemComponent> ItemToAdd)
+{
+	IProject_157CharacterInterface::AddItem_Implementation(ItemToAdd);
+}
+
+#pragma endregion 
