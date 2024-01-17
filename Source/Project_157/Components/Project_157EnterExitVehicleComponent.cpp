@@ -63,13 +63,22 @@ void UProject_157EnterExitVehicleComponent::RequestVehicleInteraction()
 
 void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 {	
-	// Check if character is nearby vehicle to enter
-	
+	// Check if character is nearby vehicle to enter	
 	const FHitResult hitResult = CanEnterVehicle();
 	if(!hitResult.bBlockingHit)
 	{
 		UE_LOG(LogTemp, Display, TEXT("%s"), *FString("Does not block hit."));
 		return;		
+	}
+
+	// hide character mesh, deactivate collision
+	APlayerController* controller = Cast<APlayerController>(GetOwner());
+	if(ACharacter* possessedCharacter = Cast<ACharacter>(	controller->GetPawn()	)	)
+	{
+		// let's store our current possessed character pawn
+		CurrentPossessedCharacter = possessedCharacter;
+		CurrentPossessedCharacter->SetActorEnableCollision(false);
+		CurrentPossessedCharacter->SetActorHiddenInGame(true);
 	}
 
 	// store vehicle ref
@@ -105,32 +114,33 @@ void UProject_157EnterExitVehicleComponent::RequestExitVehicle()
 	{
 		return;
 	}
-	
-	IProject_157VehicleInterface::Execute_RequestExitVehicle(CurrentPossessedVehicle, controller);
+	FVector BestExitLocation;
+	FRotator BestExitRotation;
+	IProject_157VehicleInterface::Execute_RequestExitVehicle(CurrentPossessedVehicle, controller, BestExitLocation, BestExitRotation);
 	
 	if(controller)
 	{
-	//	controller->ResetIgnoreMoveInput();
+		CurrentPossessedCharacter->SetActorEnableCollision(true);
+		CurrentPossessedCharacter->SetActorHiddenInGame(false);
+		CurrentPossessedCharacter->SetActorLocation(BestExitLocation);
+
+		// TODO: Teleport character mesh
+		
 		controller->Possess(CurrentPossessedCharacter);
 		CurrentPossessedVehicle = nullptr;
 	}	
 }
 
-/*
- * const UObject* WorldContextObject, const FVector Start, const FVector End, float Radius, float HalfHeight, const TArray<TEnumAsByte<EObjectTypeQuery> > & ObjectTypes,
- * bool bTraceComplex, const TArray<AActor*>& ActorsToIgnore, EDrawDebugTrace::Type DrawDebugType,
- * FHitResult& OutHit, bool bIgnoreSelf, FLinearColor TraceColor, FLinearColor TraceHitColor, float DrawTime 
- */
 FHitResult UProject_157EnterExitVehicleComponent::CanEnterVehicle()
 {
-	// TODO: Physics collision query
+	// Physics collision query
 	const FVector startLocation = OwnerCapsuleComp->GetComponentLocation();
 	const FVector endLocation =  OwnerCapsuleComp->GetComponentLocation();
 	const float radius = OwnerCapsuleComp->GetScaledCapsuleRadius();
 	const float halfHeight = OwnerCapsuleComp->GetScaledCapsuleHalfHeight();
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery5);
-	const bool bTraceComplex  = true;
+	constexpr  bool bTraceComplex  = true;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
 	FHitResult OutHit;
@@ -139,7 +149,7 @@ FHitResult UProject_157EnterExitVehicleComponent::CanEnterVehicle()
 	
 	UKismetSystemLibrary::CapsuleTraceSingleForObjects(GetOwner(), startLocation, endLocation,
 		radius, halfHeight, ObjectTypes, bTraceComplex, ActorsToIgnore,
-		EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 3.f);
+		EDrawDebugTrace::None, OutHit, true, FLinearColor::Green, FLinearColor::Red, 3.f);
 	
 	return OutHit;
 }

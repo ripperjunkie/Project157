@@ -25,5 +25,7 @@ public:
 		
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Default Components")
 	UProject_157EnterExitVehicleComponent* EnterExitVehicleComponent;
-	
+
+protected:
+	virtual void BeginPlay() override;
 };

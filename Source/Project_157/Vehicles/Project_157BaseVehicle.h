@@ -62,7 +62,7 @@ public:
 #pragma region Inherited Interfaces
 	
 	virtual void RequestEnterVehicle_Implementation(AActor* ActorRequested) override;
-	virtual void RequestExitVehicle_Implementation(AActor* ActorRequested) override;
+	virtual void RequestExitVehicle_Implementation(AActor* ActorRequested,  FVector& ExitLocation, FRotator& ExitRotation) override;
 #pragma endregion
 
 	// GETTERS
@@ -75,9 +75,25 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	/* Pawn that is possessing this vehicle */
+	UPROPERTY()
+	ACharacter* PawnPossessing; 
+
+	FVector QueryExitLocation();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	TArray<FVector> ExitDoorLocations();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	TArray<TEnumAsByte<EObjectTypeQuery>> ExitDoorCollisionTypes();
+
+	// Helper function for querying exit locations with capsule trace
+	FHitResult GetCapsuleCollisionForExitDoorLocation(FVector ExitDoorLocation);
+
 private:
 	/* Are we on a 'slippery' surface */
 	bool bIsLowFriction;
+	
 
 
 };

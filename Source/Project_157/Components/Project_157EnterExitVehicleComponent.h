@@ -21,13 +21,16 @@ public:
 	// Sets default values for this component's properties
 	UProject_157EnterExitVehicleComponent();
 
-	// Methods to enter and exit vehicle	
+	// Methods for vehicle interaction	
 	UFUNCTION()
 	void RequestVehicleInteraction();
 	UFUNCTION(BlueprintCallable)
 	void RequestEnterVehicle();
 	UFUNCTION(BlueprintCallable)
 	void RequestExitVehicle();
+	
+
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -39,11 +42,12 @@ protected:
 
 private:
 	UPROPERTY()
-	UCapsuleComponent* OwnerCapsuleComp;
-	UPROPERTY()
 	ACharacter* CurrentPossessedCharacter;
 	UPROPERTY()
+	UCapsuleComponent* OwnerCapsuleComp;
+	UPROPERTY()
 	AActor* CurrentPossessedVehicle;
+	
 
 public:
 	// // Called every frame

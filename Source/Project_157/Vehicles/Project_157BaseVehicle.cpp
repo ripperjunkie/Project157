@@ -9,12 +9,15 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "WheeledVehicleMovementComponent4W.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/Engine.h"
+#include "GameFramework/Character.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerInput.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #ifndef HMD_MODULE_INCLUDED
 #define HMD_MODULE_INCLUDED 0
@@ -133,6 +136,55 @@ void AProject_157BaseVehicle::BeginPlay()
 	Controller = nullptr;
 }
 
+FVector AProject_157BaseVehicle::QueryExitLocation()
+{
+	// we get the exit door locations from blueprint (scene components)
+	TArray<FVector> exitLocations = ExitDoorLocations();
+	FVector desiredLoc = GetActorLocation();
+
+	if(exitLocations.Num() ==	0)
+	{
+		UE_LOG(LogTemp,Display,TEXT("%s : We found a BAD location to exit vehicle."), *FString(__FUNCTION__))
+		return desiredLoc;
+	}
+	
+	for(const auto& it : exitLocations)
+	{
+		FHitResult cacheHitResult = GetCapsuleCollisionForExitDoorLocation(it);
+		if(!cacheHitResult.bBlockingHit)
+		{
+			desiredLoc = cacheHitResult.TraceEnd;
+			UE_LOG(LogTemp,Display,TEXT("%s : We found a good location to exit vehicle. LOC: %s / %s"), *FString(__FUNCTION__),
+				*FString(desiredLoc.ToString()), *FString(GetCapsuleCollisionForExitDoorLocation((it)).Location.ToString()));
+			break;
+		}		
+	}
+	
+	//UE_LOG(LogTemp,Display,TEXT("%s : We found a BAD location to exit vehicle."), *FString(__FUNCTION__))
+	return desiredLoc;
+}
+
+FHitResult AProject_157BaseVehicle::GetCapsuleCollisionForExitDoorLocation(FVector ExitDoorLocation)
+{
+	// Physics collision query
+	FHitResult OutHit;	
+	const FVector startLocation = ExitDoorLocation;
+	const FVector endLocation =  ExitDoorLocation;
+	const float radius = PawnPossessing ? PawnPossessing->GetCapsuleComponent()->GetScaledCapsuleRadius() : 34.F;
+	const float halfHeight =PawnPossessing ? PawnPossessing->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() : 88.F;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = ExitDoorCollisionTypes();
+	constexpr bool bTraceComplex  = true;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetOwner());
+	ActorsToIgnore.Add(this);
+	
+	UKismetSystemLibrary::CapsuleTraceSingleForObjects(GetOwner(), startLocation, endLocation,
+		radius, halfHeight, ObjectTypes, bTraceComplex, ActorsToIgnore,
+		EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Yellow, 6.f);
+	
+	return OutHit;
+}
+
 void AProject_157BaseVehicle::Tick(float Delta)
 {
 	Super::Tick(Delta);
@@ -159,28 +211,28 @@ void AProject_157BaseVehicle::RequestEnterVehicle_Implementation(AActor* ActorRe
 		
 		if(controller->IsPlayerController())
 		{
+			// we assume that pawns that can possess vehicles are at least of type ACharacter. It's fine for now, 
+			PawnPossessing = Cast<ACharacter>(controller->GetPawn());
 			controller->ResetIgnoreMoveInput();
 			controller->Possess(this);
 		}
 	}
 }
 
-void AProject_157BaseVehicle::RequestExitVehicle_Implementation(AActor* ActorRequested)
-{
-	IProject_157VehicleInterface::RequestExitVehicle_Implementation(ActorRequested);
+void AProject_157BaseVehicle::RequestExitVehicle_Implementation(AActor* ActorRequested,  FVector& ExitLocation, FRotator& ExitRotation)
+{	
+	// Query collision to find proper location to exit character capsule.
+	ExitLocation = QueryExitLocation();
 	
-	// TODO: Query collision to find proper location to exit character capsule.
+	//Desired rotation = car forward rotation	
+	ExitRotation = FRotator(0, GetActorRotation().Yaw, 0.F);
 	
 	
+	IProject_157VehicleInterface::RequestExitVehicle_Implementation(ActorRequested, ExitLocation, ExitRotation);
+
+	PawnPossessing = nullptr;
 	GetVehicleMovement()->StopMovementImmediately();
-	GetVehicleMovement()->SetHandbrakeInput(true);
-	
-	if(APlayerController* controller = Cast<APlayerController>(ActorRequested))
-	{
-		controller->PlayerInput->FlushPressedKeys();
-//		controller->SetIgnoreMoveInput(true);
-	//	controller->UnPossess();
-	}
+	GetVehicleMovement()->SetHandbrakeInput(true);	
 }
 
 
