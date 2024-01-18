@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2023 @ Rafael Zagolin
+﻿// Copyright (c) 2024 @ Rafael Zagolin
 
 
 #include "Project_157ItemComponent.h"
-#include "Project_157/Items/Project_157HeroItem.h"
 
 // Sets default values for this component's properties
 UProject_157ItemComponent::UProject_157ItemComponent()

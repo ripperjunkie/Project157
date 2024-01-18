@@ -1,6 +1,4 @@
-﻿// Copyright (c) 2023 @ Rafael Zagolin
-
-
+﻿// Copyright (c) 2024 @ Rafael Zagolin
 #include "Project_157WeaponComponent.h"
 
 #include "Project_157/Characters/Project_157Player.h"
@@ -183,7 +181,8 @@ void UProject_157WeaponComponent::Hitscan()
 		
 		if(IProject_157CharacterInterface* hitActorInterface = Cast<IProject_157CharacterInterface>(hitActor))
 		{
-			IProject_157CharacterInterface::Execute_TakeDamage(hitActor, WeaponCodeData.Damage, GetOwner());
+			//  float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser
+			IProject_157CharacterInterface::Execute_TakeDamage(hitActor, WeaponCodeData.Damage, FDamageEvent(), nullptr, GetOwner());
 			//UE_LOG(Cyber_WeaponComponent, Display, TEXT("%s"), *FString("should be causing damage"));
 		}
 		

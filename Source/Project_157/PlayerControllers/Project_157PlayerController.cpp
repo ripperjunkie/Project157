@@ -1,10 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Copyright (c) 2024 @ Rafael Zagolin
 
 #include "Project_157PlayerController.h"
-
-#include "GameFramework/PlayerInput.h"
-
 #include "Project_157/Components/Project_157EnterExitVehicleComponent.h"
 
 

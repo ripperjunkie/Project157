@@ -1,4 +1,5 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright (c) 2024 @ Rafael Zagolin
+
 
 #include "Project_157.h"
 #include "Modules/ModuleManager.h"

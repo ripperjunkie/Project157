@@ -1,4 +1,4 @@
-// Copyright (c) 2023 @ Rafael Zagolin
+// Copyright (c) 2024 @ Rafael Zagolin
 
 #pragma once
 
@@ -31,8 +31,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnShoot_Camera(FVector& _MuzzleLocation, FVector& Direction);
 
+	/* Having this method with the exact same signature from the Character class method might
+	 * seem redundant, but we actually can expand it being an interface on classes that are not Character type.*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void TakeDamage(float _Damage, AActor* DamageCauser);
+	void TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void AddItem(TSubclassOf<UProject_157ItemComponent> ItemToAdd);

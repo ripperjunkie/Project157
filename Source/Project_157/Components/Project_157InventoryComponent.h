@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 @ Rafael Zagolin
+﻿// Copyright (c) 2024 @ Rafael Zagolin
 
 #pragma once
 

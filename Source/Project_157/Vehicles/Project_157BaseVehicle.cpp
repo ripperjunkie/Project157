@@ -97,8 +97,8 @@ void AProject_157BaseVehicle::SetupPlayerInputComponent(class UInputComponent* P
 
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("MoveForward", this, &AProject_157BaseVehicle::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AProject_157BaseVehicle::MoveRight);
+	PlayerInputComponent->BindAxis("Accelerate/Reverse", this, &AProject_157BaseVehicle::MoveForward);
+	PlayerInputComponent->BindAxis("Steer", this, &AProject_157BaseVehicle::MoveRight);
 	PlayerInputComponent->BindAxis("LookUp");
 	PlayerInputComponent->BindAxis("LookRight");
 

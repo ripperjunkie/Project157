@@ -1,6 +1,8 @@
-// Copyright (c) 2023 @ Rafael Zagolin
+// Copyright (c) 2024 @ Rafael Zagolin
 
 #include "Project_157HealthComponent.h"
+
+#include "Kismet/KismetSystemLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogHealthComponent);
 
@@ -25,7 +27,20 @@ void UProject_157HealthComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 	if (bDebug)
 	{
-		UE_LOG(LogHealthComponent, Display, TEXT("CurrentHealth: %f"), CurrentHealth);
+		const AActor* Owner = GetOwner();
+
+
+		if(!Owner)
+			return;
+		UKismetSystemLibrary::DrawDebugString(
+			Owner,
+			Owner->GetActorLocation(),
+			FString("HP: " + FString::SanitizeFloat(GetCurrentHealth())),
+			0,
+			FLinearColor::Green,
+			0.f
+			);
+		//UE_LOG(LogHealthComponent, Display, TEXT("CurrentHealth: %f"), CurrentHealth);
 	}
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2023 @ Rafael Zagolin
+// Copyright (c) 2024 @ Rafael Zagolin
 
 #pragma once
 
@@ -8,8 +8,11 @@
 
 #include "Project_157Player.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(Log_Player, Log, All);
 
+DECLARE_LOG_CATEGORY_EXTERN(LogProject_157Player, Log, All);
+
+class UProject_157InventoryComponent;
+class UProject_157HealthComponent;
 class USpringArmComponent;
 class UCameraComponent;
 
@@ -42,7 +45,8 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	
 #pragma region Default Components
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Default Components")
@@ -60,21 +64,37 @@ protected:
 	void Input_MoveRight(float Axis);
 	void Input_LookUp(float Axis);
 	void Input_LookRight(float Axis);
+
+	// Traversal actions
+	void Input_Jump();
+	void Input_Sprint();
+	
+	
+	// Weapon Actions
+	void Input_Shoot();
+	void Input_Reload();
+	void Input_ItemCycleUp();
+	void Input_ItemCycleDown();
+	void Input_Aim();
+	
 	
 #pragma endregion
 
-#pragma region IProject_157CharacterInterface Methods
+#pragma region IProject_157CharacterInterface 
 
 	virtual void OnChangeInventoryItem_Implementation() override;
 	virtual void OnShoot_Implementation(FVector& _MuzzleLocation) override;
 	virtual void OnShoot_Camera_Implementation(FVector& _MuzzleLocation, FVector& Direction) override;
-	virtual void TakeDamage_Implementation(float _Damage, AActor* DamageCauser) override;
+	virtual void TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void AddItem_Implementation(TSubclassOf<UProject_157ItemComponent> ItemToAdd) override;
 	
 #pragma endregion
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
+	UProject_157HealthComponent* HealthComponent;
 	
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
+	UProject_157InventoryComponent* InventoryComponent;
 	
 	
 };
