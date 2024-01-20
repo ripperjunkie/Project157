@@ -15,6 +15,8 @@
 #include "Project_157/Components/Project_157WeaponComponent.h"
 #include "Project_157/Interfaces/Project_157ItemInterface.h"
 
+#include <cmath>
+
 DEFINE_LOG_CATEGORY(LogProject_157Player);
 
 
@@ -311,7 +313,7 @@ void AProject_157Player::OnChangeInventoryItem_Implementation()
 	if(!WeaponItem)
 	{
 		SetCurrentEquippedWeaponType(EProject_157Weapon::None);
-		SetCurrentState(EProject_157ActionState::Walking);
+		ResetState(EProject_157ActionState::WeaponEquipped);
 		return;
 	}
 		
@@ -329,12 +331,12 @@ float AProject_157Player::GetGroundSpeed_Implementation()
 
 EProject_157ActionState AProject_157Player::GetCharacterState_Implementation()
 {
-	return static_cast<EProject_157ActionState>(CurrentActionState);
+	return static_cast<EProject_157ActionState>(std::log2(CurrentActionState));
 }
 
 EProject_157Weapon AProject_157Player::GetCurrentEquippedWeapon_Implementation()
 {
-	return static_cast<EProject_157Weapon>(CurrentEquippedWeapon);
+	return static_cast<EProject_157Weapon>(std::log2(CurrentEquippedWeapon));
 }
 
 #pragma endregion 
@@ -366,6 +368,11 @@ bool AProject_157Player::CheckEquippedWeapon(EProject_157Weapon EquippedWeapon)
 void AProject_157Player::SetCurrentEquippedWeaponType(EProject_157Weapon state)
 {	
 	CurrentEquippedWeapon |= static_cast<uint32>(state);
+}
+
+void AProject_157Player::ResetCurrentEquippedWeaponState(EProject_157Weapon state)
+{
+	CurrentEquippedWeapon &= (~static_cast<uint32>(state));
 }
 
 void AProject_157Player::ToggleAim(bool aiming)

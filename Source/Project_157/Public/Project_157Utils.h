@@ -14,15 +14,14 @@ class USkeletalMesh;
 UENUM(BlueprintType)
 enum class EProject_157ActionState : uint8
 {
-	None = 0,
-	Aiming = 1 << 0,
-	Shooting = 1 << 1,
-	Melee = 1 << 2,
-	Walking = 1 << 3, /* walking or running */
-	Dashing = 1 << 4,
-	ChargeJump = 1 << 5,
-	OnHoverboard = 1 << 6,
-	WeaponEquipped = 1 << 7
+	Walking = 0,
+	Aiming = 1 << 0, // 1
+	Shooting = 1 << 1, // 2
+	Melee = 1 << 2, // 4
+	Dashing = 1 << 3, // 8
+	ChargeJump = 1 << 4, // 16
+	OnHoverboard = 1 << 5, // 32
+	WeaponEquipped = 1 << 6, // 64
 };
 
 /* State that defines current weapon character is holding */
@@ -62,7 +61,7 @@ struct FProject_157ItemData :  public FTableRowBase
 	TWeakObjectPtr<USkeletalMesh> ItemSK;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAnimInstance* AnimInstance;
+	TSubclassOf<UAnimInstance> AnimInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EProject_157Weapon Weapon;

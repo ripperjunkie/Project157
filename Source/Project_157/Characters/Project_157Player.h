@@ -48,6 +48,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentEquippedWeaponType(EProject_157Weapon state);
 
+	UFUNCTION(BlueprintCallable)
+	void ResetCurrentEquippedWeaponState(EProject_157Weapon state);
 	
 	UPROPERTY()
 	int32 CurrentActionState;
