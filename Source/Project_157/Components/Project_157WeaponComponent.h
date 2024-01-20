@@ -32,6 +32,9 @@ public:
 	virtual void TryReload();
 
 	UPROPERTY()
+	int32 CurrentEquippedWeapon;
+
+	UPROPERTY()
 	AProject_157Player* PlayerRef;
 
 	UPROPERTY(BlueprintReadOnly)

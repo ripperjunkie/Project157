@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Project_157/Interfaces/Project_157CharacterAnimInterface.h"
 #include "Project_157/Interfaces/Project_157CharacterInterface.h"
+#include "Project_157/Public/Project_157Utils.h"
 
 #include "Project_157Player.generated.h"
 
@@ -15,9 +17,11 @@ class UProject_157InventoryComponent;
 class UProject_157HealthComponent;
 class USpringArmComponent;
 class UCameraComponent;
+class USkeletalMeshComponent;
 
 UCLASS()
-class PROJECT_157_API AProject_157Player : public ACharacter, public IProject_157CharacterInterface
+class PROJECT_157_API AProject_157Player : public ACharacter, public IProject_157CharacterInterface,
+public IProject_157CharacterAnimInterface
 {
 	GENERATED_BODY()
 	
@@ -32,12 +36,24 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentState(EProject_157ActionState state);
-
+	
 	UFUNCTION(BlueprintCallable)
 	void ResetState(EProject_157ActionState state);
 
+
+	UFUNCTION(BlueprintPure, BlueprintCallable)
+	bool CheckEquippedWeapon(EProject_157Weapon EquippedWeapon);
+
+	/* Set current equipped weapon for weapon state type */
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentEquippedWeaponType(EProject_157Weapon state);
+
+	
 	UPROPERTY()
 	int32 CurrentActionState;
+	
+	UPROPERTY()
+	int32 CurrentEquippedWeapon;
 
 protected:
 	virtual void BeginPlay() override;
@@ -54,6 +70,10 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Default Components")
 	UCameraComponent* CameraComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Default Components")
+	USkeletalMeshComponent* WeaponSKComponent;
+	
 
 #pragma endregion
 
@@ -90,11 +110,22 @@ protected:
 	
 #pragma endregion
 
+#pragma region IProject_157CharacterInterface
+	
+	virtual float GetGroundSpeed_Implementation() override;
+	virtual EProject_157ActionState GetCharacterState_Implementation() override;
+	virtual EProject_157Weapon GetCurrentEquippedWeapon_Implementation() override;
+#pragma endregion 
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
 	UProject_157HealthComponent* HealthComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
 	UProject_157InventoryComponent* InventoryComponent;
-	
-	
+
+	UFUNCTION(BlueprintCallable)
+	void ToggleAim(bool aiming);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FProject_157PlayerData PlayerData;
 };

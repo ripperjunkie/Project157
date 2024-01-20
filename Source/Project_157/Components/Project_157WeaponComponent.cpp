@@ -144,7 +144,7 @@ void UProject_157WeaponComponent::Hitscan()
 
 	// Camera line trace
 	FVector MuzzleLoc = FVector::ZeroVector;
-	FVector EndLoc = CameraTrace_Helper().bBlockingHit ? CameraTrace_Helper().ImpactPoint : CameraTrace_Helper().TraceEnd;
+	const FVector EndLoc = CameraTrace_Helper().bBlockingHit ? CameraTrace_Helper().ImpactPoint : CameraTrace_Helper().TraceEnd;
 	
 	
 	IProject_157CharacterInterface* heroInterface = Cast<IProject_157CharacterInterface>(GetOwner());
@@ -173,15 +173,9 @@ void UProject_157WeaponComponent::Hitscan()
 		{
 			return;						
 		}
-		// Check if it's not the owner
-		// if(hitActor == GetOwner())
-		// {
-		// 	return;
-		// }
 		
 		if(IProject_157CharacterInterface* hitActorInterface = Cast<IProject_157CharacterInterface>(hitActor))
 		{
-			//  float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser
 			IProject_157CharacterInterface::Execute_TakeDamage(hitActor, WeaponCodeData.Damage, FDamageEvent(), nullptr, GetOwner());
 			//UE_LOG(Cyber_WeaponComponent, Display, TEXT("%s"), *FString("should be causing damage"));
 		}

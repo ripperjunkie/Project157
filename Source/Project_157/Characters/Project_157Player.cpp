@@ -7,9 +7,8 @@
 
 #include "Camera/CameraComponent.h"
 
-
-
 #include "TimerManager.h"
+
 #include "Project_157/Components/Project_157HealthComponent.h"
 #include "Project_157/Components/Project_157InventoryComponent.h"
 #include "Project_157/Components/Project_157ItemComponent.h"
@@ -40,6 +39,9 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 		CameraComponent->SetupAttachment(SpringArmComponent);
 	}
 
+	WeaponSKComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSK"));
+	WeaponSKComponent->SetupAttachment(GetRootComponent());
+
 	/* Creating inventory component by default */
 	InventoryComponent = CreateDefaultSubobject<UProject_157InventoryComponent>(TEXT("Inventory Component"));
 	
@@ -56,31 +58,15 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 	
 }
 
-bool AProject_157Player::CheckState(EProject_157ActionState stateToCheck)
-{
-	// check if that particular bit is on or not
-	return (CurrentActionState & static_cast<uint32>(stateToCheck) ) > (static_cast<uint32>(stateToCheck) - 1);
-}
-
-void AProject_157Player::SetCurrentState(EProject_157ActionState state)
-{
-	// turn on that particular bit
-	CurrentActionState |= static_cast<uint32>(state);
-}
-
-void AProject_157Player::ResetState(EProject_157ActionState state)
-{
-	// turn off that particular bit
-	CurrentActionState &= (~static_cast<uint32>(state));
-}
-
 
 // Called when the game starts or when spawned
 void AProject_157Player::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PlayerData.DefaultFOV = CameraComponent->FieldOfView;
 }
+
 
 void AProject_157Player::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
@@ -105,15 +91,22 @@ void AProject_157Player::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("LookRight", this, &ThisClass::Input_LookRight);
 	PlayerInputComponent->BindAxis("LookUp", this, &ThisClass::Input_LookUp);
 
+	// Traversal actions
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ThisClass::Input_Sprint);
+
 	// Weapon actions
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &ThisClass::Input_Shoot);
 	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &ThisClass::Input_Shoot);
-	
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ThisClass::Input_Aim);	
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ThisClass::Input_Aim);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ThisClass::Input_Reload);
+	PlayerInputComponent->BindAction("ItemCycleUp", IE_Pressed, this, &ThisClass::Input_ItemCycleUp);
+	PlayerInputComponent->BindAction("ItemCycleDown", IE_Pressed, this, &ThisClass::Input_ItemCycleDown);
 }
 
 
 float AProject_157Player::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator,
-                            AActor* DamageCauser)
+							AActor* DamageCauser)
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
@@ -128,7 +121,8 @@ void AProject_157Player::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		return;
 	}
-	
+
+	// Check to see if overlapped item implements interface, if so, call it on the object.
 	if(IProject_157ItemInterface* itemInterface = Cast<IProject_157ItemInterface>(OtherActor))
 	{
 		IProject_157ItemInterface::Execute_PickupItem(OtherActor, this);	
@@ -188,6 +182,7 @@ void AProject_157Player::Input_Jump()
 void AProject_157Player::Input_Sprint()
 {
 	// TODO:
+	UE_LOG(LogProject_157Player, Display, TEXT("%s"), *FString(__FUNCTION__));
 }
 
 void AProject_157Player::Input_Shoot()
@@ -233,16 +228,31 @@ void AProject_157Player::Input_Reload()
 void AProject_157Player::Input_ItemCycleUp()
 {
 	// TODO:
+	check(InventoryComponent);
+	InventoryComponent->StopUsingItemRequest();
+	InventoryComponent->CycleUp();
 }
 
 void AProject_157Player::Input_ItemCycleDown()
 {
 	// TODO:
+	check(InventoryComponent);
+	InventoryComponent->StopUsingItemRequest();
+	InventoryComponent->CycleDown();
 }
 
 void AProject_157Player::Input_Aim()
 {
-	// TODO:
+	if (CheckState(EProject_157ActionState::Aiming))
+	{
+		ResetState(EProject_157ActionState::Aiming);
+		ToggleAim(false);
+	}
+	else
+	{
+		ToggleAim(true);
+		SetCurrentState(EProject_157ActionState::Aiming);
+	}
 }
 
 
@@ -250,10 +260,7 @@ void AProject_157Player::Input_Aim()
 
 #pragma region IProject_157CharacterInterface 
 
-void AProject_157Player::OnChangeInventoryItem_Implementation()
-{
-	IProject_157CharacterInterface::OnChangeInventoryItem_Implementation();
-}
+
 
 // Blueprint will be overriding this method
 void AProject_157Player::OnShoot_Implementation(FVector& _MuzzleLocation)
@@ -284,7 +291,7 @@ void AProject_157Player::AddItem_Implementation(TSubclassOf<UProject_157ItemComp
 {
 	IProject_157CharacterInterface::AddItem_Implementation(ItemToAdd);
 	
-	// Add item
+	// Add item to player inventory
 	UProject_157ItemComponent* item = Cast<UProject_157ItemComponent>(AddComponentByClass(ItemToAdd, false, GetTransform(), true));
 	if (item)
 	{
@@ -294,4 +301,74 @@ void AProject_157Player::AddItem_Implementation(TSubclassOf<UProject_157ItemComp
 	}
 }
 
+void AProject_157Player::OnChangeInventoryItem_Implementation()
+{
+	/* This wouldn't be the final code, we'd have to iterate on it based on different items types.
+	 * Currently we only have weapon item type so it's fine.
+	*/
+	const UProject_157WeaponComponent* WeaponItem =  Cast<UProject_157WeaponComponent>(InventoryComponent->GetCurrentItem());
+	
+	if(!WeaponItem)
+	{
+		SetCurrentEquippedWeaponType(EProject_157Weapon::None);
+		SetCurrentState(EProject_157ActionState::Walking);
+		return;
+	}
+		
+	SetCurrentState(EProject_157ActionState::WeaponEquipped);
+	SetCurrentEquippedWeaponType(WeaponItem->ItemData.Weapon);
+}
+
+float AProject_157Player::GetGroundSpeed_Implementation()
+{
+	 	float Speed = 0;	
+	 	const FVector velocity = GetCharacterMovement()->Velocity;
+	 	Speed = FVector(velocity.X, velocity.Y,0.F).Size();
+	 	return Speed;
+}
+
+EProject_157ActionState AProject_157Player::GetCharacterState_Implementation()
+{
+	return static_cast<EProject_157ActionState>(CurrentActionState);
+}
+
+EProject_157Weapon AProject_157Player::GetCurrentEquippedWeapon_Implementation()
+{
+	return static_cast<EProject_157Weapon>(CurrentEquippedWeapon);
+}
+
 #pragma endregion 
+
+
+bool AProject_157Player::CheckState(EProject_157ActionState stateToCheck)
+{
+	// check if that particular bit is on or not
+	return (CurrentActionState & static_cast<uint32>(stateToCheck) ) > (static_cast<uint32>(stateToCheck) - 1);
+}
+
+void AProject_157Player::SetCurrentState(EProject_157ActionState state)
+{
+	// turn on that particular bit
+	CurrentActionState |= static_cast<uint32>(state);
+}
+
+void AProject_157Player::ResetState(EProject_157ActionState state)
+{
+	// turn off that particular bit
+	CurrentActionState &= (~static_cast<uint32>(state));
+}
+
+bool AProject_157Player::CheckEquippedWeapon(EProject_157Weapon EquippedWeapon)
+{
+	return (CurrentEquippedWeapon & static_cast<uint32>(EquippedWeapon) ) > (static_cast<uint32>(EquippedWeapon) - 1);
+}
+
+void AProject_157Player::SetCurrentEquippedWeaponType(EProject_157Weapon state)
+{	
+	CurrentEquippedWeapon |= static_cast<uint32>(state);
+}
+
+void AProject_157Player::ToggleAim(bool aiming)
+{
+	CameraComponent->FieldOfView = aiming ?  PlayerData.AimFOV : PlayerData.DefaultFOV;
+}

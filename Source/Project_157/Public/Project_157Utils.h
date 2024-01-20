@@ -9,6 +9,7 @@
 #include "Project_157Utils.generated.h"
 
 class USoundCue;
+class USkeletalMesh;
 
 UENUM(BlueprintType)
 enum class EProject_157ActionState : uint8
@@ -21,7 +22,21 @@ enum class EProject_157ActionState : uint8
 	Dashing = 1 << 4,
 	ChargeJump = 1 << 5,
 	OnHoverboard = 1 << 6,
-	Grinding = 1 << 7
+	WeaponEquipped = 1 << 7
+};
+
+/* State that defines current weapon character is holding */
+UENUM(BlueprintType)
+enum class EProject_157Weapon : uint8
+{
+	None = 0,
+	AR4 = 1 << 0,
+	G67_Grenade = 1 << 1,
+	KA_Val = 1 << 2,
+	KA_47 = 1 << 3, /* walking or running */
+	KA74U = 1 << 4,
+	M9_Knife = 1 << 5,
+	SMG_11 = 1 << 6
 };
 
 UENUM(BlueprintType)
@@ -43,6 +58,14 @@ struct FProject_157ItemData :  public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FString ItemName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)	
+	TWeakObjectPtr<USkeletalMesh> ItemSK;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UAnimInstance* AnimInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EProject_157Weapon Weapon;
 };
 
 USTRUCT(BlueprintType)

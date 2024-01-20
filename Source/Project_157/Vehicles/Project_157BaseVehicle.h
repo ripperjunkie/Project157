@@ -63,6 +63,7 @@ public:
 	
 	virtual void RequestEnterVehicle_Implementation(AActor* ActorRequested) override;
 	virtual void RequestExitVehicle_Implementation(AActor* ActorRequested,  FVector& ExitLocation, FRotator& ExitRotation) override;
+	
 #pragma endregion
 
 	// GETTERS
@@ -71,6 +72,9 @@ public:
 	{
 		return 0.f;
 	}
+
+	UFUNCTION(BlueprintCallable)
+	void SetController(AController* NewController);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -93,9 +97,6 @@ protected:
 private:
 	/* Are we on a 'slippery' surface */
 	bool bIsLowFriction;
-	
-
-
 };
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

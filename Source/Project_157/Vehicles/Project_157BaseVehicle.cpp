@@ -16,18 +16,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
 #include "GameFramework/Controller.h"
-#include "GameFramework/PlayerInput.h"
 #include "Kismet/KismetSystemLibrary.h"
-
-#ifndef HMD_MODULE_INCLUDED
-#define HMD_MODULE_INCLUDED 0
-#endif
-
-// Needed for VR Headset
-#if HMD_MODULE_INCLUDED
-#include "IXRTrackingSystem.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
-#endif // HMD_MODULE_INCLUDED
 
 const FName AProject_157BaseVehicle::LookUpBinding("LookUp");
 const FName AProject_157BaseVehicle::LookRightBinding("LookRight");
@@ -107,6 +96,25 @@ void AProject_157BaseVehicle::SetupPlayerInputComponent(class UInputComponent* P
 
 }
 
+
+
+void AProject_157BaseVehicle::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Controller = nullptr;
+}
+
+void AProject_157BaseVehicle::Tick(float Delta)
+{
+	Super::Tick(Delta);
+	
+	// Setup the flag to say we are in reverse gear
+	bInReverseGear = GetVehicleMovement()->GetCurrentGear() < 0;
+	
+}
+
+
 void AProject_157BaseVehicle::MoveForward(float Val)
 {
 	GetVehicleMovementComponent()->SetThrottleInput(Val);
@@ -128,13 +136,6 @@ void AProject_157BaseVehicle::OnHandbrakeReleased()
 	GetVehicleMovementComponent()->SetHandbrakeInput(false);
 }
 
-
-void AProject_157BaseVehicle::BeginPlay()
-{
-	Super::BeginPlay();
-
-	Controller = nullptr;
-}
 
 FVector AProject_157BaseVehicle::QueryExitLocation()
 {
@@ -185,30 +186,19 @@ FHitResult AProject_157BaseVehicle::GetCapsuleCollisionForExitDoorLocation(FVect
 	return OutHit;
 }
 
-void AProject_157BaseVehicle::Tick(float Delta)
-{
-	Super::Tick(Delta);
-	
-	if(!IsPawnControlled())
-	{
-		return;
-	}
-	
-	// Setup the flag to say we are in reverse gear
-	bInReverseGear = GetVehicleMovement()->GetCurrentGear() < 0;
-	
-}
-
 void AProject_157BaseVehicle::RequestEnterVehicle_Implementation(AActor* ActorRequested)
 {
 	IProject_157VehicleInterface::RequestEnterVehicle_Implementation(ActorRequested);
 	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 
-	// Enter vehicle, check if it's controlled pawn by a human, then possess this vehicle.
-	
-	if(AController* controller = Cast<AController>(ActorRequested))
+	if(GetController())
 	{
-		
+		GetController()->UnPossess();
+	}
+
+	// Enter vehicle, check if it's controlled pawn by a human, then possess this vehicle.	
+	if(AController* controller = Cast<AController>(ActorRequested))
+	{		
 		if(controller->IsPlayerController())
 		{
 			// we assume that pawns that can possess vehicles are at least of type ACharacter. It's fine for now, 
@@ -235,7 +225,20 @@ void AProject_157BaseVehicle::RequestExitVehicle_Implementation(AActor* ActorReq
 	GetVehicleMovement()->SetHandbrakeInput(true);	
 }
 
-
+void AProject_157BaseVehicle::SetController(AController* NewController)
+{
+	if(!NewController)
+		return;
+	
+	check(GetVehicleMovement())
+	
+	
+	GetVehicleMovement()->SetOverrideController(NewController);
+	Controller = NewController;
+	NewController->Possess(this);
+	this->ReceivePossessed(NewController);
+	
+}
 
 #undef LOCTEXT_NAMESPACE
 
