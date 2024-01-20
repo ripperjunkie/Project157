@@ -317,7 +317,7 @@ void AProject_157Player::OnChangeInventoryItem_Implementation()
 		return;
 	}
 		
-	SetCurrentState(EProject_157ActionState::WeaponEquipped);
+	//SetCurrentState(EProject_157ActionState::WeaponEquipped);
 	SetCurrentEquippedWeaponType(WeaponItem->ItemData.Weapon);
 }
 
