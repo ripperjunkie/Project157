@@ -323,7 +323,7 @@ void AProject_157Player::OnChangeInventoryItem_Implementation()
 	}
 		
 	SetCurrentState(EProject_157ActionState::WeaponEquipped);
-	SetCurrentEquippedWeaponType(WeaponItem->ItemData.Weapon);
+	SetCurrentEquippedWeaponType(WeaponItem->WeaponCodeData.Weapon);
 }
 
 float AProject_157Player::GetGroundSpeed_Implementation()

@@ -25,8 +25,8 @@ void UProject_157WeaponComponent::BeginPlay()
 	Super::BeginPlay();
 
 	WeaponCodeData.CurrentAmmo = WeaponCodeData.MaxAmmoPerClip;
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%d"), WeaponCodeData.CurrentAmmo);
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%d"), WeaponCodeData.MaxAmmoPerClip);
+	///UE_LOG(LogCS_WeaponComponent, Display, TEXT("%d"), WeaponCodeData.CurrentAmmo);
+	///UE_LOG(LogCS_WeaponComponent, Display, TEXT("%d"), WeaponCodeData.MaxAmmoPerClip);
 
 }
 
@@ -42,7 +42,7 @@ void UProject_157WeaponComponent::Start_UsingItem()
 {
 	Super::Start_UsingItem();
 
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
 
 
 	if (!PlayerRef)
@@ -67,7 +67,7 @@ void UProject_157WeaponComponent::Stop_UsingItem()
 		PlayerRef = Cast<AProject_157Player>(GetOwner());
 	}
 
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
 
 
 	if (PlayerRef)
@@ -87,13 +87,13 @@ void UProject_157WeaponComponent::AddingExistingItem()
 	
 	// for now I'm hard coding the bullets amount that will get added to this weapon
 	WeaponCodeData.TotalRemainingAmmo  += WeaponCodeData.MaxAmmoPerClip * WeaponCodeData.ClipsAmountToCollect;
-	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 }
 
 
 void UProject_157WeaponComponent::StartShooting()
 {
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT(""));
+	//UE_LOG(LogCS_WeaponComponent, Display, TEXT(""));
 	
 	GetWorld()->GetTimerManager().SetTimer(
 		WeaponCodeData.FireRateTimer,
@@ -115,13 +115,12 @@ void UProject_157WeaponComponent::StopShooting()
 void UProject_157WeaponComponent::Shoot()
 {
 	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
-
+	PlayShootSound();
+	
 	if (WeaponCodeData.bInfiniteBullets)
 	{
 		Hitscan();
-		PlayShootSound();
 		// TODO: Play shoot effect
-		
 		return;
 	}
 
@@ -131,8 +130,7 @@ void UProject_157WeaponComponent::Shoot()
 
 		// TODO: Check to see why it's not working with ternary operator
 		//WeaponData.bHitscan ?  Hitscan() : SpawnProjectile();
-		Hitscan();
-		PlayShootSound();
+		Hitscan();		
 		return;
 	}
 	WeaponCodeData.CurrentAmmo = 0;
@@ -196,6 +194,7 @@ void UProject_157WeaponComponent::TryReload()
 	{
 		// find how many bullets we need
 		int32 x = WeaponCodeData.MaxAmmoPerClip - WeaponCodeData.CurrentAmmo;
+		PlayReloadSound();
 		if(WeaponCodeData.TotalRemainingAmmo >= x)
 		{
 			WeaponCodeData.TotalRemainingAmmo -= x;

@@ -62,9 +62,6 @@ struct FProject_157ItemData :  public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UAnimInstance> AnimInstance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProject_157Weapon Weapon;
 };
 
 USTRUCT(BlueprintType)
@@ -114,6 +111,17 @@ struct FProject_157WeaponData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EProject_157WeaponFireType WeaponFireType;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EProject_157Weapon Weapon;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USoundCue* ShootingSound;	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USoundCue* ReloadingSound;		
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USoundCue* OutOfAmmoSound;
+	
 
 
 	/* DEBUG */

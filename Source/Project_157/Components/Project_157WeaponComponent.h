@@ -54,7 +54,6 @@ public:
 	void PlayShootSound();	
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayReloadSound();
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
