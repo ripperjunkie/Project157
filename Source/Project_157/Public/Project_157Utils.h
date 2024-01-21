@@ -58,7 +58,7 @@ struct FProject_157ItemData :  public FTableRowBase
 	FString ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)	
-	TWeakObjectPtr<USkeletalMesh> ItemSK;
+	USkeletalMesh* ItemSK;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UAnimInstance> AnimInstance;

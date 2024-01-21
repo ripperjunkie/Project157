@@ -41,8 +41,13 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 		CameraComponent->SetupAttachment(SpringArmComponent);
 	}
 
+	
+
+
+	ComponentTEST = CreateDefaultSubobject<USceneComponent>(TEXT("TEST"));
+	
 	WeaponSKComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSK"));
-	WeaponSKComponent->SetupAttachment(GetRootComponent());
+	WeaponSKComponent->SetupAttachment(ComponentTEST);
 
 	/* Creating inventory component by default */
 	InventoryComponent = CreateDefaultSubobject<UProject_157InventoryComponent>(TEXT("Inventory Component"));
@@ -317,7 +322,7 @@ void AProject_157Player::OnChangeInventoryItem_Implementation()
 		return;
 	}
 		
-	//SetCurrentState(EProject_157ActionState::WeaponEquipped);
+	SetCurrentState(EProject_157ActionState::WeaponEquipped);
 	SetCurrentEquippedWeaponType(WeaponItem->ItemData.Weapon);
 }
 
@@ -337,6 +342,11 @@ EProject_157ActionState AProject_157Player::GetCharacterState_Implementation()
 EProject_157Weapon AProject_157Player::GetCurrentEquippedWeapon_Implementation()
 {
 	return static_cast<EProject_157Weapon>(std::log2(CurrentEquippedWeapon));
+}
+
+bool AProject_157Player::GetCheckState_Implementation(EProject_157ActionState State)
+{
+	return this->CheckState(State);
 }
 
 #pragma endregion 
@@ -378,4 +388,6 @@ void AProject_157Player::ResetCurrentEquippedWeaponState(EProject_157Weapon stat
 void AProject_157Player::ToggleAim(bool aiming)
 {
 	CameraComponent->FieldOfView = aiming ?  PlayerData.AimFOV : PlayerData.DefaultFOV;
+	GetCharacterMovement()->bOrientRotationToMovement = !aiming;
+	bUseControllerRotationYaw = aiming;
 }

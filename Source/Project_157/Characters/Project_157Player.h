@@ -18,6 +18,7 @@ class UProject_157HealthComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class USkeletalMeshComponent;
+class USceneComponent;
 
 UCLASS()
 class PROJECT_157_API AProject_157Player : public ACharacter, public IProject_157CharacterInterface,
@@ -76,7 +77,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Default Components")
 	USkeletalMeshComponent* WeaponSKComponent;
 	
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default Components")
+	USceneComponent* ComponentTEST;
+	
 #pragma endregion
 
 
@@ -112,11 +115,12 @@ protected:
 	
 #pragma endregion
 
-#pragma region IProject_157CharacterInterface
+#pragma region IProject_157CharacterAnimInterface
 	
 	virtual float GetGroundSpeed_Implementation() override;
 	virtual EProject_157ActionState GetCharacterState_Implementation() override;
 	virtual EProject_157Weapon GetCurrentEquippedWeapon_Implementation() override;
+	virtual bool GetCheckState_Implementation(EProject_157ActionState State) override;
 #pragma endregion 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)

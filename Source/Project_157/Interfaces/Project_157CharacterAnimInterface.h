@@ -35,4 +35,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EProject_157Weapon GetCurrentEquippedWeapon();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool GetCheckState(EProject_157ActionState State);
 };
