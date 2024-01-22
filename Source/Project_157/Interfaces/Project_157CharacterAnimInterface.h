@@ -38,4 +38,10 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool GetCheckState(EProject_157ActionState State);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	float GetLookForwardAngle();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	float GetLookUpAngle();
 };

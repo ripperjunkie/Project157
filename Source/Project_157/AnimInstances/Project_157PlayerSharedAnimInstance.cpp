@@ -14,11 +14,12 @@ void UProject_157PlayerSharedAnimInstance::NativeUpdateAnimation(float DeltaSeco
 	if(!PawnOwner)
 		return;
 
-	if(const IProject_157CharacterAnimInterface* itemInterface = Cast<IProject_157CharacterAnimInterface>(PawnOwner))
+	if(const IProject_157CharacterAnimInterface* charAnimInterface = Cast<IProject_157CharacterAnimInterface>(PawnOwner))
 	{
-		GroundSpeed = itemInterface->Execute_GetGroundSpeed(PawnOwner);
-		GetCharacterState = (int32)itemInterface->Execute_GetCharacterState(PawnOwner) + 1;
-		GetEquippedWeapon = (int32)itemInterface->Execute_GetCurrentEquippedWeapon(PawnOwner) + 1;
-		bAiming = itemInterface->Execute_GetCheckState(PawnOwner, EProject_157ActionState::Aiming);
+		GroundSpeed = charAnimInterface->Execute_GetGroundSpeed(PawnOwner);
+		GetCharacterState = (int32)charAnimInterface->Execute_GetCharacterState(PawnOwner) + 1;
+		GetEquippedWeapon = (int32)charAnimInterface->Execute_GetCurrentEquippedWeapon(PawnOwner) + 1;
+		bAiming = charAnimInterface->Execute_GetCheckState(PawnOwner, EProject_157ActionState::Aiming);
+		GetLookAngle = FVector2D(charAnimInterface->Execute_GetLookForwardAngle(PawnOwner), charAnimInterface->Execute_GetLookUpAngle(PawnOwner));
 	}
 }

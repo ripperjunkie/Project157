@@ -20,12 +20,18 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	float GroundSpeed;
+	
 	UPROPERTY(BlueprintReadOnly)
 	int32 GetCharacterState;
+	
 	UPROPERTY(BlueprintReadOnly)
 	int32 GetEquippedWeapon;
+	
 	UPROPERTY(BlueprintReadOnly)
 	uint8 bAiming : 1;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FVector2D GetLookAngle;
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)

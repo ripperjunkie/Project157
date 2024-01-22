@@ -349,6 +349,26 @@ bool AProject_157Player::GetCheckState_Implementation(EProject_157ActionState St
 	return this->CheckState(State);
 }
 
+float AProject_157Player::GetLookForwardAngle_Implementation()
+{
+	FVector actorRight = GetActorRightVector().GetSafeNormal();
+	FVector controlDirection = FRotationMatrix(FRotator(0, GetControlRotation().Yaw, 0)).GetUnitAxis(EAxis::X).GetSafeNormal();
+
+	float forwardAngle =   FVector::DotProduct(actorRight, controlDirection)	/ (actorRight.Size() * controlDirection.Size());
+	forwardAngle = RAD_TO_DEG(FMath::Acos(forwardAngle));
+	return forwardAngle - 90.F;
+}
+
+float AProject_157Player::GetLookUpAngle_Implementation()
+{
+	FVector actorUp = GetActorUpVector().GetSafeNormal();
+	FVector controlDirection = FRotationMatrix(FRotator(GetControlRotation().Pitch, 0, 0)).GetUnitAxis(EAxis::X).GetSafeNormal();
+	
+	float upAngle = FVector::DotProduct(actorUp, controlDirection) / (actorUp.Size() * controlDirection.Size());
+	upAngle = RAD_TO_DEG(FMath::Acos(upAngle));
+	return upAngle - 90.f;
+}
+
 #pragma endregion 
 
 

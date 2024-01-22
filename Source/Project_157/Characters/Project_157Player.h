@@ -121,6 +121,9 @@ protected:
 	virtual EProject_157ActionState GetCharacterState_Implementation() override;
 	virtual EProject_157Weapon GetCurrentEquippedWeapon_Implementation() override;
 	virtual bool GetCheckState_Implementation(EProject_157ActionState State) override;
+	virtual float GetLookForwardAngle_Implementation() override;
+	virtual float GetLookUpAngle_Implementation() override;
+	
 #pragma endregion 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)

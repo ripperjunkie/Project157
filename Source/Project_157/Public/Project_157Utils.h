@@ -8,6 +8,9 @@
 
 #include "Project_157Utils.generated.h"
 
+#define DOUBLE_PI (3.141592653589793238462643383279502884197169399)
+#define RAD_TO_DEG(x) 180.F / DOUBLE_PI * x
+
 class USoundCue;
 class USkeletalMesh;
 
