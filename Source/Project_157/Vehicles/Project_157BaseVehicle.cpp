@@ -10,6 +10,7 @@
 #include "Components/InputComponent.h"
 #include "WheeledVehicleMovementComponent4W.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SpotLightComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/Engine.h"
 #include "GameFramework/Character.h"
@@ -28,12 +29,15 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 AProject_157BaseVehicle::AProject_157BaseVehicle(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	// Car mesh
-	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/Vehicle/Sedan/Sedan_SkelMesh.Sedan_SkelMesh"));
-	//GetMesh()->SetSkeletalMesh(CarMesh.Object);
-
-	//static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/Vehicle/Sedan/Sedan_AnimBP"));
-	//GetMesh()->SetAnimInstanceClass(AnimBPClass.Class);
+	L_HeadlightComp = CreateDefaultSubobject<USpotLightComponent>(TEXT("L_HeadlightComp"));
+	L_HeadlightComp->SetupAttachment(GetRootComponent());
+	L_HeadlightComp->SetVisibility(false);
+	L_HeadlightComp->CastShadows = false;
+	
+	R_HeadlightComp = CreateDefaultSubobject<USpotLightComponent>(TEXT("R_HeadlightComp"));
+	R_HeadlightComp->SetupAttachment(GetRootComponent());
+	R_HeadlightComp->SetVisibility(false);
+	R_HeadlightComp->CastShadows = false;
 	
 	// Simulation
 	UWheeledVehicleMovementComponent4W* Vehicle4W = CastChecked<UWheeledVehicleMovementComponent4W>(GetVehicleMovement());
@@ -86,14 +90,14 @@ void AProject_157BaseVehicle::SetupPlayerInputComponent(class UInputComponent* P
 
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("Accelerate/Reverse", this, &AProject_157BaseVehicle::MoveForward);
-	PlayerInputComponent->BindAxis("Steer", this, &AProject_157BaseVehicle::MoveRight);
+	PlayerInputComponent->BindAxis("Accelerate/Reverse", this, &AProject_157BaseVehicle::Input_MoveForward);
+	PlayerInputComponent->BindAxis("Steer", this, &AProject_157BaseVehicle::Input_MoveRight);
 	PlayerInputComponent->BindAxis("LookUp");
 	PlayerInputComponent->BindAxis("LookRight");
 
-	PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &AProject_157BaseVehicle::OnHandbrakePressed);
-	PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &AProject_157BaseVehicle::OnHandbrakeReleased);
-
+	PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &AProject_157BaseVehicle::Input_OnHandbrakePressed);
+	PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &AProject_157BaseVehicle::Input_OnHandbrakeReleased);
+	PlayerInputComponent->BindAction("Headlight", IE_Pressed, this, &AProject_157BaseVehicle::Input_ToggleHeadlight);
 }
 
 
@@ -115,25 +119,33 @@ void AProject_157BaseVehicle::Tick(float Delta)
 }
 
 
-void AProject_157BaseVehicle::MoveForward(float Val)
+void AProject_157BaseVehicle::Input_MoveForward(float Val)
 {
 	GetVehicleMovementComponent()->SetThrottleInput(Val);
 	UE_LOG(LogTemp,Warning,TEXT("%f"), Val);
 }
 
-void AProject_157BaseVehicle::MoveRight(float Val)
+void AProject_157BaseVehicle::Input_MoveRight(float Val)
 {
 	GetVehicleMovementComponent()->SetSteeringInput(Val);
 }
 
-void AProject_157BaseVehicle::OnHandbrakePressed()
+void AProject_157BaseVehicle::Input_OnHandbrakePressed()
 {
 	GetVehicleMovementComponent()->SetHandbrakeInput(true);
 }
 
-void AProject_157BaseVehicle::OnHandbrakeReleased()
+void AProject_157BaseVehicle::Input_OnHandbrakeReleased()
 {
 	GetVehicleMovementComponent()->SetHandbrakeInput(false);
+}
+
+void AProject_157BaseVehicle::Input_ToggleHeadlight()
+{
+	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
+	bool bToggle = !L_HeadlightComp->IsVisible();
+	R_HeadlightComp->SetVisibility(bToggle);
+	L_HeadlightComp->SetVisibility(bToggle);
 }
 
 

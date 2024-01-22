@@ -20,6 +20,7 @@ void AProject_157PlayerController::SetupInputComponent()
 
 	check(InputComponent);
 	InputComponent->BindAction("EnterExitVehicle", IE_Pressed, EnterExitVehicleComponent, &UProject_157EnterExitVehicleComponent::RequestVehicleInteraction);
+	
 }
 
 void AProject_157PlayerController::BeginPlay()

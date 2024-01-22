@@ -36,7 +36,7 @@ public:
 	UBoxComponent* BoxCollision;
 	
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UProject_157ItemComponent> ItemClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

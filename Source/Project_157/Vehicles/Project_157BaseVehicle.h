@@ -7,6 +7,7 @@
 #include "Project_157/Interfaces/Project_157VehicleInterface.h"
 #include "Project_157BaseVehicle.generated.h"
 
+class USpotLightComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputComponent;
@@ -28,6 +29,11 @@ public:
 	/** Camera component that will be our viewpoint */
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
+
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpotLightComponent* R_HeadlightComp;	
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpotLightComponent* L_HeadlightComp;
 	
 	/** Are we in reverse gear */
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly)
@@ -42,14 +48,15 @@ public:
 
 	
 	/** Handle pressing forwards */
-	void MoveForward(float Val);
-
+	void Input_MoveForward(float Val);
 	/** Handle pressing right */
-	void MoveRight(float Val);
+	void Input_MoveRight(float Val);
 	/** Handle handbrake pressed */
-	void OnHandbrakePressed();
+	void Input_OnHandbrakePressed();
 	/** Handle handbrake released */
-	void OnHandbrakeReleased();
+	void Input_OnHandbrakeReleased();
+	/**	Handle car headlights pressed */
+	void Input_ToggleHeadlight();
 	
 	static const FName LookUpBinding;
 	static const FName LookRightBinding;

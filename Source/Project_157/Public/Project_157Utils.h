@@ -62,10 +62,16 @@ struct FProject_157ItemData :  public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UAnimInstance> AnimInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector RelativeLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FRotator RelativeRotation;
+	
 };
 
 USTRUCT(BlueprintType)
-struct FProject_157WeaponData
+struct FProject_157WeaponData :  public FTableRowBase
 {
 	GENERATED_BODY()
 
