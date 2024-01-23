@@ -291,7 +291,8 @@ void AProject_157Player::Input_Reload()
 		UE_LOG(LogProject_157Player, Display, TEXT("%s, invalid currentEquippedWeapon!"), *FString(__FUNCTION__));
 		return;
 	}
-
+	
+	Input_ReloadBP();
 	currentEquippedWeapon->TryReload();
 }
 

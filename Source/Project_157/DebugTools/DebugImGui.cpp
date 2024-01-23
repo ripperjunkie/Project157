@@ -19,8 +19,13 @@ void DebugImGui::DrawInfo()
 	ImGui::Begin(TCHAR_TO_UTF8(*FString("Debug Info: " + objectName)), nullptr, ImGuiWindowFlags_None);
 	if(IProject_157DebugInfo* debugInfo = Cast<IProject_157DebugInfo>(owner))
 	{		
-		ImGui::LabelText(TCHAR_TO_UTF8(*FString::SanitizeFloat(debugInfo->GetCharacterMovementComponent()->MaxWalkSpeed)), "Max Walk speed: ");		
-		ImGui::LabelText(TCHAR_TO_UTF8(*FString::SanitizeFloat(debugInfo->GetCharacterMovementComponent()->Velocity.Size())), "current velocity: ");		
+		ImGui::LabelText(TCHAR_TO_UTF8(
+			*FString::SanitizeFloat(debugInfo->GetCharacterMovementComponent()->MaxWalkSpeed))
+			, "Max Walk speed: ");
+		
+		ImGui::LabelText(TCHAR_TO_UTF8(
+			*FString::SanitizeFloat(debugInfo->GetCharacterMovementComponent()->Velocity.Size())),
+			"current velocity: ");		
 	}
 	ImGui::End();
 }

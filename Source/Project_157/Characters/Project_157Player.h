@@ -159,6 +159,10 @@ protected:
 	void Input_Reload();
 	void Input_ItemCycleUp();
 	void Input_ItemCycleDown();
+
+	/** Called on blueprint when player asks to reload weapon. */
+	UFUNCTION(BlueprintImplementableEvent)
+	void Input_ReloadBP();
 	
 	
 #pragma endregion
