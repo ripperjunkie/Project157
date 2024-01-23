@@ -18,13 +18,13 @@ UENUM(BlueprintType)
 enum class EProject_157ActionState : uint8
 {
 	Walking = 0,
-	Aiming = 1 << 0, // 1
-	Shooting = 1 << 1, // 2
-	Melee = 1 << 2, // 4
-	Dashing = 1 << 3, // 8
-	ChargeJump = 1 << 4, // 16
-	OnHoverboard = 1 << 5, // 32
-	WeaponEquipped = 1 << 6, // 64
+	Aiming = 1 << 0, 
+	Shooting = 1 << 1,
+	Melee = 1 << 2, 
+	Crouching = 1 << 3, 
+	ChargeJump = 1 << 4, 
+	Sprinting = 1 << 5, 
+	WeaponEquipped = 1 << 6, 
 };
 
 /* State that defines current weapon character is holding */
@@ -158,37 +158,60 @@ struct FProject_157InputSettings
 	FVector2D GamepadSensitivity;	
 };
 
-USTRUCT(BlueprintType)
-struct FDefaultMovementSettings
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float MaxWalkSpeed;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float MaxAcceleration;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float GroundFriction;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float GravityScale;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float BrakingDecelerationWalking;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float JumpZVelocity;
-};
 
 USTRUCT(BlueprintType)
 struct FProject_157PlayerData :  public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float DefaultFOV;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float AimFOV;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float DefaultArmLength = 450.f;	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float AimArmLength = 350.f;
+};
+
+USTRUCT(BlueprintType)
+struct FProject_157DefaultMovementSettings
+{
+	GENERATED_BODY()
+
+	/** Equivalent to character default speed. */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	float MaxWalkSpeed;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	float MaxAcceleration;
+	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	float GroundFriction;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	float GravityScale;
+	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	float BrakingDecelerationWalking;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	float JumpZVelocity;
+};
+
+USTRUCT(BlueprintType)
+struct FProject_157MovementSettings
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float RunWalkSpeed = 550.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float CrouchWalkSpeed = 150.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float AimWalkSpeed = 200.f;
 };

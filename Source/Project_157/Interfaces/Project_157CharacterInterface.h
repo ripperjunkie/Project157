@@ -15,6 +15,7 @@ class UProject_157CharacterInterface : public UInterface
 	GENERATED_BODY()
 };
 
+
 class PROJECT_157_API IProject_157CharacterInterface
 {
 	GENERATED_BODY()

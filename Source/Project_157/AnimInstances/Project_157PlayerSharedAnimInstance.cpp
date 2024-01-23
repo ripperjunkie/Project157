@@ -21,5 +21,6 @@ void UProject_157PlayerSharedAnimInstance::NativeUpdateAnimation(float DeltaSeco
 		GetEquippedWeapon = (int32)charAnimInterface->Execute_GetCurrentEquippedWeapon(PawnOwner) + 1;
 		bAiming = charAnimInterface->Execute_GetCheckState(PawnOwner, EProject_157ActionState::Aiming);
 		GetLookAngle = FVector2D(charAnimInterface->Execute_GetLookForwardAngle(PawnOwner), charAnimInterface->Execute_GetLookUpAngle(PawnOwner));
+		bCrouching = charAnimInterface->Execute_GetCheckState(PawnOwner, EProject_157ActionState::Crouching);
 	}
 }

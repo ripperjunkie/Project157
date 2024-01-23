@@ -14,8 +14,13 @@
 #include "Project_157/Components/Project_157ItemComponent.h"
 #include "Project_157/Components/Project_157WeaponComponent.h"
 #include "Project_157/Interfaces/Project_157ItemInterface.h"
+#include "Project_157/Components/Project_157AimComponent.h"
+#include "Project_157/Components/Project_157SprintComponent.h"
 
 #include <cmath>
+
+#include "Project_157/DebugTools/DebugImGui.h"
+
 
 DEFINE_LOG_CATEGORY(LogProject_157Player);
 
@@ -41,13 +46,15 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 		CameraComponent->SetupAttachment(SpringArmComponent);
 	}
 
-	
+	/* Creating sprint component by default */
+	SprintComponent = CreateDefaultSubobject<UProject_157SprintComponent>(TEXT("SprintComponent"));
+		
+	/* Creating aim component by default */
+	AimComponent = CreateDefaultSubobject<UProject_157AimComponent>(TEXT("AimComponent"));
 
-
-	ComponentTEST = CreateDefaultSubobject<USceneComponent>(TEXT("TEST"));
 	
 	WeaponSKComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSK"));
-	WeaponSKComponent->SetupAttachment(ComponentTEST);
+	WeaponSKComponent->SetupAttachment(GetRootComponent());
 
 	/* Creating inventory component by default */
 	InventoryComponent = CreateDefaultSubobject<UProject_157InventoryComponent>(TEXT("Inventory Component"));
@@ -55,7 +62,7 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 	/* Creating inventory component by default */
 	HealthComponent = CreateDefaultSubobject<UProject_157HealthComponent>(TEXT("Health Component"));
 	HealthComponent->SetMaxHealth(100);
-	
+
 	
 	// Default params for character
 	// Keep character facing forward (to where camera is facing)
@@ -70,20 +77,47 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 void AProject_157Player::BeginPlay()
 {
 	Super::BeginPlay();
+	check(SprintComponent);
+	check(AimComponent);
+	
+	ImGui = new DebugImGui();
+	ImGui->owner = this;
 
 	PlayerData.DefaultFOV = CameraComponent->FieldOfView;
+	PlayerData.DefaultArmLength = SpringArmComponent->TargetArmLength;
+	DefaultMovementSettings.MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	SprintComponent->PlayerRef = this;
+	AimComponent->PlayerRef = this;
 }
 
 
 void AProject_157Player::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+	delete ImGui;
 }
 
 // Called every frame
 void AProject_157Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(CheckState(EProject_157ActionState::Sprinting))
+	{
+		if(GetCharacterMovement()->GetCurrentAcceleration().Size() == 0)
+		{
+			// it means player is not giving input to keep moving character
+			if(!CheckState(EProject_157ActionState::Crouching) || !CheckState(EProject_157ActionState::Aiming))
+				SprintComponent->StopSprint();
+			
+			ResetState(EProject_157ActionState::Sprinting);			
+		}
+	}
+
+	if(ImGui)
+	{
+		ImGui->DrawInfo();
+	}
 }
 
 
@@ -104,11 +138,12 @@ void AProject_157Player::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	// Weapon actions
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &ThisClass::Input_Shoot);
 	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &ThisClass::Input_Shoot);
-	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ThisClass::Input_Aim);	
-	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ThisClass::Input_Aim);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, AimComponent, &UProject_157AimComponent::StartAim);	
+	PlayerInputComponent->BindAction("Aim", IE_Released, AimComponent,  &UProject_157AimComponent::StopAim);
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ThisClass::Input_Reload);
 	PlayerInputComponent->BindAction("ItemCycleUp", IE_Pressed, this, &ThisClass::Input_ItemCycleUp);
 	PlayerInputComponent->BindAction("ItemCycleDown", IE_Pressed, this, &ThisClass::Input_ItemCycleDown);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ThisClass::Input_Crouch);
 }
 
 
@@ -188,8 +223,36 @@ void AProject_157Player::Input_Jump()
 
 void AProject_157Player::Input_Sprint()
 {
-	// TODO:
-	UE_LOG(LogProject_157Player, Display, TEXT("%s"), *FString(__FUNCTION__));
+	UE_LOG(LogProject_157Player, Display, TEXT("%s"), *FString(__FUNCTION__));	
+	check(SprintComponent);
+	
+	if(!CheckState(EProject_157ActionState::Sprinting))
+	{
+		SprintComponent->StartSprint();
+		return;
+	}
+	SprintComponent->StopSprint();
+}
+
+void AProject_157Player::Input_Crouch()
+{
+	// Reset character from crouch mode
+	if(CheckState(EProject_157ActionState::Crouching))
+	{		
+		GetCharacterMovement()->UnCrouch();
+		ResetState(EProject_157ActionState::Crouching);
+		
+		if(!CheckState(EProject_157ActionState::Aiming))
+			GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSettings.MaxWalkSpeed;
+		
+		return;
+	}
+	
+	// Set character to crouch mode	
+	GetCharacterMovement()->Crouch();
+	GetCharacterMovement()->MaxWalkSpeed = MovementSettings.CrouchWalkSpeed;
+	SetCurrentState(EProject_157ActionState::Crouching);
+	ResetState(EProject_157ActionState::Sprinting);
 }
 
 void AProject_157Player::Input_Shoot()
@@ -246,20 +309,6 @@ void AProject_157Player::Input_ItemCycleDown()
 	check(InventoryComponent);
 	InventoryComponent->StopUsingItemRequest();
 	InventoryComponent->CycleDown();
-}
-
-void AProject_157Player::Input_Aim()
-{
-	if (CheckState(EProject_157ActionState::Aiming))
-	{
-		ResetState(EProject_157ActionState::Aiming);
-		ToggleAim(false);
-	}
-	else
-	{
-		ToggleAim(true);
-		SetCurrentState(EProject_157ActionState::Aiming);
-	}
 }
 
 
@@ -369,6 +418,11 @@ float AProject_157Player::GetLookUpAngle_Implementation()
 	return upAngle - 90.f;
 }
 
+UCharacterMovementComponent* AProject_157Player::GetCharacterMovementComponent() const
+{
+	return GetCharacterMovement();
+}
+
 #pragma endregion 
 
 
@@ -410,4 +464,5 @@ void AProject_157Player::ToggleAim(bool aiming)
 	CameraComponent->FieldOfView = aiming ?  PlayerData.AimFOV : PlayerData.DefaultFOV;
 	GetCharacterMovement()->bOrientRotationToMovement = !aiming;
 	bUseControllerRotationYaw = aiming;
+	SpringArmComponent->TargetArmLength = aiming ?  PlayerData.AimArmLength : PlayerData.DefaultArmLength;
 }

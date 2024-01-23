@@ -6,13 +6,17 @@
 #include "GameFramework/Character.h"
 #include "Project_157/Interfaces/Project_157CharacterAnimInterface.h"
 #include "Project_157/Interfaces/Project_157CharacterInterface.h"
+#include "Project_157/Interfaces/Project_157DebugInfo.h"
 #include "Project_157/Public/Project_157Utils.h"
 
 #include "Project_157Player.generated.h"
 
 
+class DebugImGui;
 DECLARE_LOG_CATEGORY_EXTERN(LogProject_157Player, Log, All);
 
+class UProject_157AimComponent;
+class UProject_157SprintComponent;
 class UProject_157InventoryComponent;
 class UProject_157HealthComponent;
 class USpringArmComponent;
@@ -20,9 +24,10 @@ class UCameraComponent;
 class USkeletalMeshComponent;
 class USceneComponent;
 
+
 UCLASS()
 class PROJECT_157_API AProject_157Player : public ACharacter, public IProject_157CharacterInterface,
-public IProject_157CharacterAnimInterface
+public IProject_157CharacterAnimInterface, public IProject_157DebugInfo
 {
 	GENERATED_BODY()
 	
@@ -51,12 +56,56 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetCurrentEquippedWeaponState(EProject_157Weapon state);
-	
+
 	UPROPERTY()
 	int32 CurrentActionState;
 	
 	UPROPERTY()
 	int32 CurrentEquippedWeapon;
+
+	UFUNCTION(BlueprintCallable)
+	void ToggleAim(bool aiming);
+
+#pragma region Getters
+	
+	UFUNCTION()
+	FORCEINLINE FProject_157MovementSettings GetMovementSettings() const
+	{
+		return MovementSettings;
+	}
+	
+	UFUNCTION()
+	FORCEINLINE FProject_157DefaultMovementSettings GetDefaultMovementSettings() const
+	{
+		return DefaultMovementSettings;
+	}
+
+	UFUNCTION()
+	FORCEINLINE UProject_157SprintComponent* GetSprintComponent() const
+	{
+		return SprintComponent;
+	}
+
+	UFUNCTION()
+	FORCEINLINE USpringArmComponent* GetSpringArmComponent() const
+	{
+		return SpringArmComponent;
+	}
+
+	UFUNCTION()
+	FORCEINLINE UCameraComponent* GetCameraComponent() const
+	{
+		return CameraComponent;
+	}
+	
+	UFUNCTION()
+	FORCEINLINE FProject_157PlayerData GetPlayerData() const
+	{
+		return PlayerData;
+	}
+	
+	
+#pragma endregion
 
 protected:
 	virtual void BeginPlay() override;
@@ -76,9 +125,18 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Default Components")
 	USkeletalMeshComponent* WeaponSKComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
+	UProject_157HealthComponent* HealthComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default Components")
-	USceneComponent* ComponentTEST;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
+	UProject_157InventoryComponent* InventoryComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
+	UProject_157SprintComponent* SprintComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
+	UProject_157AimComponent* AimComponent;
 	
 #pragma endregion
 
@@ -93,6 +151,7 @@ protected:
 	// Traversal actions
 	void Input_Jump();
 	void Input_Sprint();
+	void Input_Crouch();
 	
 	
 	// Weapon Actions
@@ -100,7 +159,6 @@ protected:
 	void Input_Reload();
 	void Input_ItemCycleUp();
 	void Input_ItemCycleDown();
-	void Input_Aim();
 	
 	
 #pragma endregion
@@ -112,6 +170,7 @@ protected:
 	virtual void OnShoot_Camera_Implementation(FVector& _MuzzleLocation, FVector& Direction) override;
 	virtual void TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void AddItem_Implementation(TSubclassOf<UProject_157ItemComponent> ItemToAdd) override;
+
 	
 #pragma endregion
 
@@ -122,19 +181,23 @@ protected:
 	virtual EProject_157Weapon GetCurrentEquippedWeapon_Implementation() override;
 	virtual bool GetCheckState_Implementation(EProject_157ActionState State) override;
 	virtual float GetLookForwardAngle_Implementation() override;
-	virtual float GetLookUpAngle_Implementation() override;
+	virtual float GetLookUpAngle_Implementation() override;	
 	
-#pragma endregion 
+#pragma endregion
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
-	UProject_157HealthComponent* HealthComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
-	UProject_157InventoryComponent* InventoryComponent;
-
-	UFUNCTION(BlueprintCallable)
-	void ToggleAim(bool aiming);
+#pragma region IProject_157DebugInfo
+	virtual UCharacterMovementComponent* GetCharacterMovementComponent() const override;
+#pragma endregion
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FProject_157PlayerData PlayerData;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FProject_157MovementSettings MovementSettings;
+	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
+	FProject_157DefaultMovementSettings DefaultMovementSettings;
+
+	DebugImGui* ImGui;
+
 };

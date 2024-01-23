@@ -33,6 +33,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D GetLookAngle;
 	
+	UPROPERTY(BlueprintReadOnly)
+	uint8 bCrouching : 1;
+	
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	APawn* PawnOwner;
