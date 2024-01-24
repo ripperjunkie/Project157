@@ -10,6 +10,7 @@
 #include "Project_157BaseNPC.generated.h"
 
 
+class UProject_157DamageFilter;
 DECLARE_LOG_CATEGORY_EXTERN(LogProject_157BaseEnemy, Log, All);
 
 class UProject_157HealthComponent;
@@ -46,4 +47,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Components)
 	UProject_157HealthComponent* HealthComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Components)
+	UProject_157DamageFilter* DamageFilter;
 };

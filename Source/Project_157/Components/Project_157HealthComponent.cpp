@@ -98,6 +98,7 @@ void UProject_157HealthComponent::AddHealth(float InHealth)
 
 void UProject_157HealthComponent::ReduceHealth(float InDamage, AActor* DamageCauser)
 {
+	InDamage = FMath::Abs(InDamage);
 	if (CurrentHealth - InDamage > 0)
 	{
 		CurrentHealth -= InDamage;

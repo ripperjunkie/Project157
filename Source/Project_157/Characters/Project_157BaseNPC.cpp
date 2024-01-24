@@ -1,5 +1,6 @@
 #include "Project_157BaseNPC.h"
 
+#include "Project_157/Components/Project_157DamageFilter.h"
 #include "Project_157/Components/Project_157HealthComponent.h"
 
 
@@ -14,6 +15,9 @@ AProject_157BaseNPC::AProject_157BaseNPC()
 	/* Creating inventory component by default */
 	HealthComponent = CreateDefaultSubobject<UProject_157HealthComponent>(TEXT("Health Component"));
 	HealthComponent->SetMaxHealth(100);
+
+	/* Creating damage filter component by default */
+	DamageFilter = CreateDefaultSubobject<UProject_157DamageFilter>(TEXT("Damage Filter"));
 
 }
 
@@ -33,7 +37,7 @@ void AProject_157BaseNPC::Tick(float DeltaTime)
 
 float AProject_157BaseNPC::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 	AController* EventInstigator, AActor* DamageCauser)
-{
+{	
 	HealthComponent->ReduceHealth(DamageAmount, DamageCauser);
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);	
@@ -44,7 +48,7 @@ void AProject_157BaseNPC::TakeDamage_Implementation(float DamageAmount, FDamageE
 	IProject_157CharacterInterface::TakeDamage_Implementation(DamageAmount, DamageEvent, EventInstigator, DamageCauser, BoneName);
 
 	// TODO: Filter damage
-	this->TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	this->TakeDamage(DamageFilter->FilteredDamage(DamageAmount, BoneName), DamageEvent, EventInstigator, DamageCauser);
 }
 
 

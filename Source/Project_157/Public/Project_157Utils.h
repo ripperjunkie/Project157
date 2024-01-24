@@ -218,3 +218,24 @@ struct FProject_157MovementSettings
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float AimWalkSpeed = 200.f;
 };
+
+
+/* This container will help us map out different body damage parts to filter collision
+ * when taking damage. */
+USTRUCT(BlueprintType)
+struct FProject_157BodyPartDamage : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	bool operator()(const FProject_157BodyPartDamage& Element) const
+	{
+		return Element.Bone == Bone;
+	}
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Resistance = 550.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName Bone;
+};
+

@@ -454,7 +454,7 @@ bool AProject_157Player::CheckEquippedWeapon(EProject_157Weapon EquippedWeapon)
 {
 	return (CurrentEquippedWeapon & static_cast<uint32>(EquippedWeapon) ) > (static_cast<uint32>(EquippedWeapon) - 1);
 }
-
+			
 void AProject_157Player::SetCurrentEquippedWeaponType(EProject_157Weapon state)
 {	
 	CurrentEquippedWeapon |= static_cast<uint32>(state);
