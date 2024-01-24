@@ -14,19 +14,23 @@
 class USoundCue;
 class USkeletalMesh;
 
+/* This enum has flags to store the special character actions that will be performing.
+ * It's handy because each action is independent and can happen at the same time as other actions. */
 UENUM(BlueprintType)
 enum class EProject_157ActionState : uint8
 {
-	Walking = 0,
+	None = 0, // no special actions
 	Aiming = 1 << 0, 
 	Shooting = 1 << 1,
 	Melee = 1 << 2, 
 	Crouching = 1 << 3, 
-	ChargeJump = 1 << 4, 
+	Driving = 1 << 4, 
 	Sprinting = 1 << 5, 
-	WeaponEquipped = 1 << 6, 
+	ItemEquipped = 1 << 6, 
+	Reloading = 1 << 7, 
 };
 
+// There might be a better way to store each weapon data instead of creating an enum.
 /* State that defines current weapon character is holding */
 UENUM(BlueprintType)
 enum class EProject_157Weapon : uint8
@@ -157,7 +161,6 @@ struct FProject_157InputSettings
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FVector2D GamepadSensitivity;	
 };
-
 
 
 USTRUCT(BlueprintType)

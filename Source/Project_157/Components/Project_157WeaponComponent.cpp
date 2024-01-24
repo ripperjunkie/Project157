@@ -17,6 +17,7 @@ UProject_157WeaponComponent::UProject_157WeaponComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	CollisionChannel = ECC_Visibility;
 }
 
 // Called when the game starts
@@ -108,19 +109,18 @@ void UProject_157WeaponComponent::StartShooting()
 
 void UProject_157WeaponComponent::StopShooting()
 {
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
 	GetWorld()->GetTimerManager().ClearTimer(WeaponCodeData.FireRateTimer);
 }
 
 void UProject_157WeaponComponent::Shoot()
 {
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
 	PlayShootSound();
 	
 	if (WeaponCodeData.bInfiniteBullets)
 	{
 		Hitscan();
-		// TODO: Play shoot effect
 		return;
 	}
 
@@ -138,7 +138,7 @@ void UProject_157WeaponComponent::Shoot()
 
 void UProject_157WeaponComponent::Hitscan()
 {
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
 
 	// Camera line trace
 	FVector MuzzleLoc = FVector::ZeroVector;
@@ -154,8 +154,9 @@ void UProject_157WeaponComponent::Hitscan()
 	FVector Dir = MuzzleLoc +  FRotationMatrix::MakeFromX(EndLoc - MuzzleLoc).GetUnitAxis(EAxis::X) * WeaponCodeData.BulletRange;
 
 	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLoc, Dir, ECC_Visibility);
-
+	GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLoc, Dir, CollisionChannel);
+	//UE_LOG(LogTemp, Display, TEXT("%s"), *HitResult.Actor->GetName());
+	
 	if(WeaponCodeData.bDebug)
 	{
 		DrawDebugLine(GetWorld(), MuzzleLoc, Dir, WeaponCodeData.Debug_Color, WeaponCodeData.Debug_Persistent,
@@ -163,7 +164,10 @@ void UProject_157WeaponComponent::Hitscan()
 
 		DrawDebugPoint(GetWorld(), HitResult.Location, 5.f, FColor::Red, WeaponCodeData.Debug_Persistent, WeaponCodeData.Debug_LifeTime + 6.f);
 	}
-	
+	// Debug hit bone
+	// if(HitResult.BoneName != "None")
+	// 	UE_LOG(LogTemp, Display, TEXT("%s"), *FString(HitResult.BoneName.ToString()));
+	//
 	if(HitResult.bBlockingHit)
 	{
 		AActor* hitActor = HitResult.GetActor();
@@ -174,8 +178,7 @@ void UProject_157WeaponComponent::Hitscan()
 		
 		if(IProject_157CharacterInterface* hitActorInterface = Cast<IProject_157CharacterInterface>(hitActor))
 		{
-			IProject_157CharacterInterface::Execute_TakeDamage(hitActor, WeaponCodeData.Damage, FDamageEvent(), nullptr, GetOwner());
-			//UE_LOG(Cyber_WeaponComponent, Display, TEXT("%s"), *FString("should be causing damage"));
+			IProject_157CharacterInterface::Execute_TakeDamage(hitActor, WeaponCodeData.Damage, FDamageEvent(), nullptr, GetOwner(), HitResult.BoneName);
 		}
 		
 	}
@@ -215,7 +218,7 @@ void UProject_157WeaponComponent::TryReload()
 
 void UProject_157WeaponComponent::SpawnProjectile()
 {
-	UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
 }
 
 FHitResult UProject_157WeaponComponent::CameraTrace_Helper()
@@ -232,7 +235,7 @@ FHitResult UProject_157WeaponComponent::CameraTrace_Helper()
 	
 	Dir = MuzzleLoc + Dir * HIGH_NUMBER;
 	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLoc, Dir, ECC_Visibility);
-	
+	GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLoc, Dir, CollisionChannel);
+	//UE_LOG(LogTemp, Display, TEXT("%s"), *HitResult.Actor->GetName());
 	return HitResult;
 }

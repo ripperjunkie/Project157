@@ -12,9 +12,10 @@
 #include "Project_157Player.generated.h"
 
 
-class DebugImGui;
+
 DECLARE_LOG_CATEGORY_EXTERN(LogProject_157Player, Log, All);
 
+class DebugImGui;
 class UProject_157AimComponent;
 class UProject_157SprintComponent;
 class UProject_157InventoryComponent;
@@ -57,14 +58,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ResetCurrentEquippedWeaponState(EProject_157Weapon state);
 
+	/* This might have to be moved to the player controller so we can store
+	 * info about our character state. Also it might be a good idea if we create
+	 * a component that can manage this character states.
+	 */
 	UPROPERTY()
 	int32 CurrentActionState;
 	
 	UPROPERTY()
 	int32 CurrentEquippedWeapon;
-
-	UFUNCTION(BlueprintCallable)
-	void ToggleAim(bool aiming);
 
 #pragma region Getters
 	
@@ -96,6 +98,12 @@ public:
 	FORCEINLINE UCameraComponent* GetCameraComponent() const
 	{
 		return CameraComponent;
+	}
+
+	UFUNCTION()
+	FORCEINLINE UProject_157AimComponent* GetAimComponent() const
+	{
+		return AimComponent;
 	}
 	
 	UFUNCTION()
@@ -140,7 +148,6 @@ protected:
 	
 #pragma endregion
 
-
 #pragma region Input related methods
 	
 	void Input_MoveForward(float Axis);
@@ -172,7 +179,7 @@ protected:
 	virtual void OnChangeInventoryItem_Implementation() override;
 	virtual void OnShoot_Implementation(FVector& _MuzzleLocation) override;
 	virtual void OnShoot_Camera_Implementation(FVector& _MuzzleLocation, FVector& Direction) override;
-	virtual void TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FName BoneName = "") override;
 	virtual void AddItem_Implementation(TSubclassOf<UProject_157ItemComponent> ItemToAdd) override;
 
 	
@@ -190,7 +197,36 @@ protected:
 #pragma endregion
 
 #pragma region IProject_157DebugInfo
-	virtual UCharacterMovementComponent* GetCharacterMovementComponent() const override;
+	
+	virtual UCharacterMovementComponent* Debug_GetCharacterMovementComponent() const override
+	{
+		return GetCharacterMovement();
+	}
+	
+	virtual UProject_157HealthComponent* Debug_GetHealthComponent() const override
+	{
+		return HealthComponent;
+	}
+	
+	virtual UProject_157InventoryComponent* Debug_GetInventoryComponent() const override
+	{
+		return InventoryComponent;
+	}
+	virtual UProject_157WeaponComponent* Debug_GetWeaponComponent() const override;
+	virtual UProject_157SprintComponent* Debug_GetSprintComponent() const override
+	{
+		return SprintComponent;
+	}
+	virtual UProject_157AimComponent* Debug_GetAimComponent() const override
+	{
+		return AimComponent;
+	}
+	virtual bool Debug_CharacterState(EProject_157ActionState ActionState) override
+	{
+		return CheckState(ActionState);
+	}
+	
+	
 #pragma endregion
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

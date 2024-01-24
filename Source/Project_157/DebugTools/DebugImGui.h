@@ -5,6 +5,6 @@ class DebugImGui
 public:
 	DebugImGui();
 	
-	void DrawInfo();
-	UObject* owner;
+	void DrawInfo(UObject* Owner);
+	
 };

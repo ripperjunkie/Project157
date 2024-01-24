@@ -50,6 +50,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayShootSound();	
 	UFUNCTION(BlueprintImplementableEvent)

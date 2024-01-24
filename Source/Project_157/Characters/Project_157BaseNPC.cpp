@@ -39,9 +39,9 @@ float AProject_157BaseNPC::TakeDamage(float DamageAmount, FDamageEvent const& Da
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);	
 }
 
-void AProject_157BaseNPC::TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AProject_157BaseNPC::TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FName BoneName)
 {
-	IProject_157CharacterInterface::TakeDamage_Implementation(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	IProject_157CharacterInterface::TakeDamage_Implementation(DamageAmount, DamageEvent, EventInstigator, DamageCauser, BoneName);
 
 	// TODO: Filter damage
 	this->TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

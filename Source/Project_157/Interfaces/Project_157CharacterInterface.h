@@ -35,7 +35,7 @@ public:
 	/* Having this method with the exact same signature from the Character class method might
 	 * seem redundant, but we actually can expand it being an interface on classes that are not Character type.*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	void TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FName BoneName = "");
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void AddItem(TSubclassOf<UProject_157ItemComponent> ItemToAdd);

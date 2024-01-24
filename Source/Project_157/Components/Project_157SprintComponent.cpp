@@ -3,8 +3,10 @@
 
 #include "Project_157SprintComponent.h"
 
+#include "Project_157AimComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Project_157/Characters/Project_157Player.h"
+
 
 // Sets default values for this component's properties
 UProject_157SprintComponent::UProject_157SprintComponent()
@@ -38,7 +40,7 @@ void UProject_157SprintComponent::StartSprint()
 	PlayerRef->ResetState(EProject_157ActionState::Aiming);
 	PlayerRef->SetCurrentState(EProject_157ActionState::Sprinting);
 	PlayerRef->GetCharacterMovement()->MaxWalkSpeed = PlayerRef-> GetMovementSettings().RunWalkSpeed;
-	PlayerRef->ToggleAim(false);
+	PlayerRef->GetAimComponent()->ToggleAim(false);
 }
 
 void UProject_157SprintComponent::StopSprint()

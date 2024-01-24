@@ -81,7 +81,6 @@ void AProject_157Player::BeginPlay()
 	check(AimComponent);
 	
 	ImGui = new DebugImGui();
-	ImGui->owner = this;
 
 	PlayerData.DefaultFOV = CameraComponent->FieldOfView;
 	PlayerData.DefaultArmLength = SpringArmComponent->TargetArmLength;
@@ -116,7 +115,7 @@ void AProject_157Player::Tick(float DeltaTime)
 
 	if(ImGui)
 	{
-		ImGui->DrawInfo();
+		ImGui->DrawInfo(this);
 	}
 }
 
@@ -317,8 +316,6 @@ void AProject_157Player::Input_ItemCycleDown()
 
 #pragma region IProject_157CharacterInterface 
 
-
-
 // Blueprint will be overriding this method
 void AProject_157Player::OnShoot_Implementation(FVector& _MuzzleLocation)
 {
@@ -335,9 +332,9 @@ void AProject_157Player::OnShoot_Camera_Implementation(FVector& _MuzzleLocation,
 	Direction = CameraComponent->GetForwardVector();
 }
 
-void AProject_157Player::TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AProject_157Player::TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FName BoneName)
 {
-	IProject_157CharacterInterface::TakeDamage_Implementation(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	IProject_157CharacterInterface::TakeDamage_Implementation(DamageAmount, DamageEvent, EventInstigator, DamageCauser, BoneName);
 
 	// TODO: Filter damage
 	this->TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -368,11 +365,11 @@ void AProject_157Player::OnChangeInventoryItem_Implementation()
 	if(!WeaponItem)
 	{
 		SetCurrentEquippedWeaponType(EProject_157Weapon::None);
-		ResetState(EProject_157ActionState::WeaponEquipped);
+		ResetState(EProject_157ActionState::ItemEquipped);
 		return;
 	}
 		
-	SetCurrentState(EProject_157ActionState::WeaponEquipped);
+	SetCurrentState(EProject_157ActionState::ItemEquipped);
 	SetCurrentEquippedWeaponType(WeaponItem->WeaponCodeData.Weapon);
 }
 
@@ -419,13 +416,21 @@ float AProject_157Player::GetLookUpAngle_Implementation()
 	return upAngle - 90.f;
 }
 
-UCharacterMovementComponent* AProject_157Player::GetCharacterMovementComponent() const
+#pragma endregion
+
+#pragma region IProject_157DebugInfo
+
+UProject_157WeaponComponent* AProject_157Player::Debug_GetWeaponComponent() const
 {
-	return GetCharacterMovement();
+	UProject_157WeaponComponent* weaponComp = Cast<UProject_157WeaponComponent>(InventoryComponent->GetCurrentItem());
+	if(weaponComp)
+	{
+		return weaponComp;
+	}
+	return nullptr;	
 }
 
-#pragma endregion 
-
+#pragma endregion
 
 bool AProject_157Player::CheckState(EProject_157ActionState stateToCheck)
 {
@@ -460,10 +465,3 @@ void AProject_157Player::ResetCurrentEquippedWeaponState(EProject_157Weapon stat
 	CurrentEquippedWeapon &= (~static_cast<uint32>(state));
 }
 
-void AProject_157Player::ToggleAim(bool aiming)
-{
-	CameraComponent->FieldOfView = aiming ?  PlayerData.AimFOV : PlayerData.DefaultFOV;
-	GetCharacterMovement()->bOrientRotationToMovement = !aiming;
-	bUseControllerRotationYaw = aiming;
-	SpringArmComponent->TargetArmLength = aiming ?  PlayerData.AimArmLength : PlayerData.DefaultArmLength;
-}

@@ -31,10 +31,10 @@ void UProject_157AimComponent::StartAim()
 {
 	// start aiming	
 	/* Check if character has weapon equipped. */	
-	if(!PlayerRef->CheckState(EProject_157ActionState::WeaponEquipped))
+	if(!PlayerRef->CheckState(EProject_157ActionState::ItemEquipped))
 		return;
 	
-	PlayerRef->ToggleAim(true);
+	ToggleAim(true);
 	PlayerRef->SetCurrentState(EProject_157ActionState::Aiming);
 	PlayerRef->ResetState(EProject_157ActionState::Sprinting);
 	PlayerRef->GetSprintComponent()->StopSprint();
@@ -47,7 +47,7 @@ void UProject_157AimComponent::StopAim()
 	if (PlayerRef->CheckState(EProject_157ActionState::Aiming))
 	{
 		PlayerRef->ResetState(EProject_157ActionState::Aiming);
-		PlayerRef->ToggleAim(false);
+		ToggleAim(false);
 		
 		if(!PlayerRef->CheckState(EProject_157ActionState::Crouching))
 			PlayerRef->GetCharacterMovement()->MaxWalkSpeed = PlayerRef->GetDefaultMovementSettings().MaxWalkSpeed;
