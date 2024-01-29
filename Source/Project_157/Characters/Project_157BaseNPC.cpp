@@ -52,6 +52,16 @@ void AProject_157BaseNPC::TakeDamage_Implementation(float DamageAmount, FDamageE
 }
 
 
+void AProject_157BaseNPC::OnExitedVehicle()
+{
+
+}
+
+void AProject_157BaseNPC::OnEnteredVehicle()
+{
+
+}
+
 /* Override it by blueprint.*/
 void AProject_157BaseNPC::OnShoot_Implementation(FVector& _MuzzleLocation)
 {

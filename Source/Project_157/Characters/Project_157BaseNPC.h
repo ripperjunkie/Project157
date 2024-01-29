@@ -42,6 +42,8 @@ public:
 	virtual void OnShoot_Camera_Implementation(FVector& _MuzzleLocation, FVector& Direction) override;
 	
 	virtual void TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FName BoneName = "") override;
+	virtual void OnEnteredVehicle()  override;	
+	virtual void OnExitedVehicle()  override;
 
 #pragma endregion
 

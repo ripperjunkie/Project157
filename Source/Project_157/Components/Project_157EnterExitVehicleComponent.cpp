@@ -87,6 +87,7 @@ void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 		if(CharacterInterface)
 		{
 			CharacterInterface->SetCurrentState_Implementation(EProject_157ActionState::Driving);
+			CharacterInterface->OnEnteredVehicle();
 		}
 	}
 
@@ -137,6 +138,7 @@ void UProject_157EnterExitVehicleComponent::RequestExitVehicle()
 		if(CharacterInterface)
 		{
 			CharacterInterface->ResetState_Implementation(EProject_157ActionState::Driving);
+			CharacterInterface->OnExitedVehicle();
 		}
 		
 	}	

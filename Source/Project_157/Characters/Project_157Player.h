@@ -11,8 +11,6 @@
 
 #include "Project_157Player.generated.h"
 
-
-
 DECLARE_LOG_CATEGORY_EXTERN(LogProject_157Player, Log, All);
 
 class DebugImGui;
@@ -32,14 +30,10 @@ public IProject_157CharacterAnimInterface, public IProject_157DebugInfo
 {
 	GENERATED_BODY()
 	
-
 public:
 	// Sets default values for this character's properties
 	AProject_157Player(const FObjectInitializer& ObjectInitializer);
-
-
-
-
+	
 	UFUNCTION(BlueprintPure, BlueprintCallable)
 	bool CheckEquippedWeapon(EProject_157Weapon EquippedWeapon);
 
@@ -180,6 +174,8 @@ protected:
 	virtual bool CheckState_Implementation(EProject_157ActionState stateToCheck) override;
 	virtual void SetCurrentState_Implementation(EProject_157ActionState state) override;
 	virtual void ResetState_Implementation(EProject_157ActionState state) override;
+	virtual void OnEnteredVehicle() override;
+	virtual void OnExitedVehicle() override;
 	
 #pragma endregion
 
@@ -235,8 +231,6 @@ protected:
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
 	FProject_157DefaultMovementSettings DefaultMovementSettings;
-
 	
 	DebugImGui* Debug_ImGui;
-
 };

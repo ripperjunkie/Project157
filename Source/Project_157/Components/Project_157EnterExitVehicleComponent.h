@@ -15,7 +15,7 @@ class PROJECT_157_API UProject_157EnterExitVehicleComponent : public UActorCompo
 {
 	GENERATED_BODY()
 
-	friend class AProject_157Player;
+	//friend class AProject_157Player;
 
 public:
 	// Sets default values for this component's properties
@@ -29,7 +29,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RequestExitVehicle();
 	
-
+	// // Called every frame
+// virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+//                            FActorComponentTickFunction* ThisTickFunction) override;
 	
 protected:
 	// Called when the game starts
@@ -47,10 +49,4 @@ private:
 	UCapsuleComponent* OwnerCapsuleComp;
 	UPROPERTY()
 	AActor* CurrentPossessedVehicle;
-	
-
-public:
-	// // Called every frame
-	// virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	//                            FActorComponentTickFunction* ThisTickFunction) override;
 };

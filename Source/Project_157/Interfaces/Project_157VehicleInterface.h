@@ -25,6 +25,4 @@ public:
 	void RequestEnterVehicle(AActor* ActorRequested);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void RequestExitVehicle(AActor* ActorRequested, FVector& ExitLocation, FRotator& ExitRotation);
-
-public:
 };

@@ -441,6 +441,17 @@ float AProject_157Player::GetLookUpAngle_Implementation()
 	return upAngle - 90.f;
 }
 
+void AProject_157Player::OnEnteredVehicle()
+{
+	if (AimComponent)
+		AimComponent->StopAim();
+}
+
+void AProject_157Player::OnExitedVehicle()
+{
+
+}
+
 #pragma endregion
 
 #pragma region IProject_157DebugInfo
