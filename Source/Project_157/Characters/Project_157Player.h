@@ -37,15 +37,7 @@ public:
 	// Sets default values for this character's properties
 	AProject_157Player(const FObjectInitializer& ObjectInitializer);
 
-	
-	UFUNCTION(BlueprintPure, BlueprintCallable)
-	bool CheckState(EProject_157ActionState stateToCheck);
 
-	UFUNCTION(BlueprintCallable)
-	void SetCurrentState(EProject_157ActionState state);
-	
-	UFUNCTION(BlueprintCallable)
-	void ResetState(EProject_157ActionState state);
 
 
 	UFUNCTION(BlueprintPure, BlueprintCallable)
@@ -185,7 +177,9 @@ protected:
 	virtual void OnShoot_Camera_Implementation(FVector& _MuzzleLocation, FVector& Direction) override;
 	virtual void TakeDamage_Implementation(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FName BoneName = "") override;
 	virtual void AddItem_Implementation(TSubclassOf<UProject_157ItemComponent> ItemToAdd) override;
-
+	virtual bool CheckState_Implementation(EProject_157ActionState stateToCheck) override;
+	virtual void SetCurrentState_Implementation(EProject_157ActionState state) override;
+	virtual void ResetState_Implementation(EProject_157ActionState state) override;
 	
 #pragma endregion
 
@@ -227,7 +221,7 @@ protected:
 	}
 	virtual bool Debug_CharacterState(EProject_157ActionState ActionState) override
 	{
-		return CheckState(ActionState);
+		return CheckState_Implementation(ActionState);
 	}
 	
 	

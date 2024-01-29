@@ -36,16 +36,33 @@ void UProject_157SprintComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 void UProject_157SprintComponent::StartSprint()
 {
-	PlayerRef->ResetState(EProject_157ActionState::Crouching);
-	PlayerRef->ResetState(EProject_157ActionState::Aiming);
-	PlayerRef->SetCurrentState(EProject_157ActionState::Sprinting);
+	IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(GetOwner());
+	if(!CharacterInterface)
+	{
+		return;
+	}
+	
+	CharacterInterface->ResetState_Implementation(EProject_157ActionState::Crouching);
+	CharacterInterface->ResetState_Implementation(EProject_157ActionState::Aiming);
+	CharacterInterface->SetCurrentState_Implementation(EProject_157ActionState::Sprinting);
 	PlayerRef->GetCharacterMovement()->MaxWalkSpeed = PlayerRef-> GetMovementSettings().RunWalkSpeed;
 	PlayerRef->GetAimComponent()->ToggleAim(false);
 }
 
 void UProject_157SprintComponent::StopSprint()
-{	
-	PlayerRef->ResetState(EProject_157ActionState::Sprinting);
+{
+	IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(GetOwner());
+	if(!CharacterInterface)
+	{
+		return;
+	}
+	
+	CharacterInterface->ResetState_Implementation(EProject_157ActionState::Sprinting);
+
+	if(!PlayerRef)
+	{
+		PlayerRef = Cast<AProject_157Player>(GetOwner());
+	}
 	PlayerRef->GetCharacterMovement()->MaxWalkSpeed = PlayerRef-> GetDefaultMovementSettings().MaxWalkSpeed;
 }
 

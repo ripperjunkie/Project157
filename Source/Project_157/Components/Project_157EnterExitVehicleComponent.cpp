@@ -3,9 +3,11 @@
 
 #include "Project_157EnterExitVehicleComponent.h"
 
+#include "Project_157Utils.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
+#include "Project_157/Interfaces/Project_157CharacterInterface.h"
 #include "Project_157/Interfaces/Project_157VehicleInterface.h"
 
 // Sets default values for this component's properties
@@ -79,6 +81,13 @@ void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 		CurrentPossessedCharacter = possessedCharacter;
 		CurrentPossessedCharacter->SetActorEnableCollision(false);
 		CurrentPossessedCharacter->SetActorHiddenInGame(true);
+
+		// Set driving state in driver pawn
+		IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(possessedCharacter);
+		if(CharacterInterface)
+		{
+			CharacterInterface->SetCurrentState_Implementation(EProject_157ActionState::Driving);
+		}
 	}
 
 	// store vehicle ref
@@ -98,10 +107,7 @@ void UProject_157EnterExitVehicleComponent::RequestEnterVehicle()
 		
 		UE_LOG(LogTemp, Display, TEXT("%s"), *FString(__FUNCTION__));
 	}
-	else
-	{
-		UE_LOG(LogTemp, Display, TEXT("%s"), *FString("Does not implement interface"));
-	}
+
 }
 
 void UProject_157EnterExitVehicleComponent::RequestExitVehicle()
@@ -122,12 +128,17 @@ void UProject_157EnterExitVehicleComponent::RequestExitVehicle()
 	{
 		CurrentPossessedCharacter->SetActorEnableCollision(true);
 		CurrentPossessedCharacter->SetActorHiddenInGame(false);
-		CurrentPossessedCharacter->SetActorLocation(BestExitLocation);
-
-		// TODO: Teleport character mesh
-		
+		CurrentPossessedCharacter->SetActorLocation(BestExitLocation);		
 		controller->Possess(CurrentPossessedCharacter);
 		CurrentPossessedVehicle = nullptr;
+
+		// Set driving state in driver pawn
+		IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(CurrentPossessedCharacter);
+		if(CharacterInterface)
+		{
+			CharacterInterface->ResetState_Implementation(EProject_157ActionState::Driving);
+		}
+		
 	}	
 }
 

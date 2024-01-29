@@ -107,15 +107,15 @@ void AProject_157Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(CheckState(EProject_157ActionState::Sprinting))
+	if(CheckState_Implementation(EProject_157ActionState::Sprinting))
 	{
 		if(GetCharacterMovement()->GetCurrentAcceleration().Size() == 0)
 		{
 			// it means player is not giving input to keep moving character
-			if(!CheckState(EProject_157ActionState::Crouching) || !CheckState(EProject_157ActionState::Aiming))
+			if(!CheckState_Implementation(EProject_157ActionState::Crouching) || !CheckState_Implementation(EProject_157ActionState::Aiming))
 				SprintComponent->StopSprint();
 			
-			ResetState(EProject_157ActionState::Sprinting);			
+			ResetState_Implementation(EProject_157ActionState::Sprinting);			
 		}
 	}
 
@@ -236,7 +236,7 @@ void AProject_157Player::Input_Sprint()
 	UE_LOG(LogProject_157Player, Display, TEXT("%s"), *FString(__FUNCTION__));	
 	check(SprintComponent);
 	
-	if(!CheckState(EProject_157ActionState::Sprinting))
+	if(!CheckState_Implementation(EProject_157ActionState::Sprinting))
 	{
 		SprintComponent->StartSprint();
 		return;
@@ -247,12 +247,12 @@ void AProject_157Player::Input_Sprint()
 void AProject_157Player::Input_Crouch()
 {
 	// Reset character from crouch mode
-	if(CheckState(EProject_157ActionState::Crouching))
+	if(CheckState_Implementation(EProject_157ActionState::Crouching))
 	{		
 		GetCharacterMovement()->UnCrouch();
-		ResetState(EProject_157ActionState::Crouching);
+		ResetState_Implementation(EProject_157ActionState::Crouching);
 		
-		if(!CheckState(EProject_157ActionState::Aiming))
+		if(!CheckState_Implementation(EProject_157ActionState::Aiming))
 			GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSettings.MaxWalkSpeed;
 		
 		return;
@@ -261,8 +261,8 @@ void AProject_157Player::Input_Crouch()
 	// Set character to crouch mode	
 	GetCharacterMovement()->Crouch();
 	GetCharacterMovement()->MaxWalkSpeed = MovementSettings.CrouchWalkSpeed;
-	SetCurrentState(EProject_157ActionState::Crouching);
-	ResetState(EProject_157ActionState::Sprinting);
+	SetCurrentState_Implementation(EProject_157ActionState::Crouching);
+	ResetState_Implementation(EProject_157ActionState::Sprinting);
 }
 
 void AProject_157Player::Input_StartShoot()
@@ -389,11 +389,11 @@ void AProject_157Player::OnChangeInventoryItem_Implementation()
 	if(!WeaponItem)
 	{
 		SetCurrentEquippedWeaponType(EProject_157Weapon::None);
-		ResetState(EProject_157ActionState::ItemEquipped);
+		ResetState_Implementation(EProject_157ActionState::ItemEquipped);
 		return;
 	}
 		
-	SetCurrentState(EProject_157ActionState::ItemEquipped);
+	SetCurrentState_Implementation(EProject_157ActionState::ItemEquipped);
 	SetCurrentEquippedWeaponType(WeaponItem->WeaponCodeData.Weapon);
 }
 
@@ -418,7 +418,7 @@ EProject_157Weapon AProject_157Player::GetCurrentEquippedWeapon_Implementation()
 
 bool AProject_157Player::GetCheckState_Implementation(EProject_157ActionState State)
 {
-	return this->CheckState(State);
+	return this->CheckState_Implementation(State);
 }
 
 float AProject_157Player::GetLookForwardAngle_Implementation()
@@ -457,19 +457,19 @@ UProject_157WeaponComponent* AProject_157Player::Debug_GetWeaponComponent() cons
 
 #pragma endregion
 
-bool AProject_157Player::CheckState(EProject_157ActionState stateToCheck)
+bool AProject_157Player::CheckState_Implementation(EProject_157ActionState stateToCheck)
 {
 	// check if that particular bit is on or not
 	return (CurrentActionState & static_cast<uint32>(stateToCheck) ) > (static_cast<uint32>(stateToCheck) - 1);
 }
 
-void AProject_157Player::SetCurrentState(EProject_157ActionState state)
+void AProject_157Player::SetCurrentState_Implementation(EProject_157ActionState state)
 {
 	// turn on that particular bit
 	CurrentActionState |= static_cast<uint32>(state);
 }
 
-void AProject_157Player::ResetState(EProject_157ActionState state)
+void AProject_157Player::ResetState_Implementation(EProject_157ActionState state)
 {
 	// turn off that particular bit
 	CurrentActionState &= (~static_cast<uint32>(state));

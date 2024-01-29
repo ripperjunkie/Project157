@@ -3,6 +3,7 @@
 
 #include "Project_157/Characters/Project_157Player.h"
 
+
 #include "DrawDebugHelpers.h"
 
 
@@ -25,9 +26,6 @@ void UProject_157WeaponComponent::BeginPlay()
 	Super::BeginPlay();
 
 	WeaponCodeData.CurrentAmmo = WeaponCodeData.MaxAmmoPerClip;
-	///UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%d"), WeaponCodeData.CurrentAmmo);
-	///UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%d"), WeaponCodeData.MaxAmmoPerClip);
-
 }
 
 // Called every frame
@@ -43,17 +41,14 @@ void UProject_157WeaponComponent::Start_UsingItem()
 	Super::Start_UsingItem();
 
 	//UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
-
-
-	if (!PlayerRef)
+	
+	IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(GetOwner());
+	if(!CharacterInterface)
 	{
-		PlayerRef = Cast<AProject_157Player>(GetOwner());
+		return;
 	}
-
-	if (PlayerRef)
-	{
-		PlayerRef->SetCurrentState(EProject_157ActionState::Shooting);
-	}
+	CharacterInterface->SetCurrentState_Implementation(EProject_157ActionState::Shooting);
+	
 
 	StartShooting();
 }
@@ -61,21 +56,17 @@ void UProject_157WeaponComponent::Start_UsingItem()
 void UProject_157WeaponComponent::Stop_UsingItem()
 {
 	Super::Stop_UsingItem();
-
-	if (!PlayerRef)
+	
+	IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(GetOwner());
+	if(!CharacterInterface)
 	{
-		PlayerRef = Cast<AProject_157Player>(GetOwner());
+		return;
 	}
 
-	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
-
-
-	if (PlayerRef)
-	{
-		PlayerRef->ResetState(EProject_157ActionState::Shooting);
-	}
+	CharacterInterface->ResetState_Implementation(EProject_157ActionState::Shooting);	
 
 	StopShooting();
+	
 	GetWorld()->GetTimerManager().SetTimer(WasShootingTimer, [this]()
 	{
 	}, WasShootingTimerF, false);
@@ -172,14 +163,15 @@ void UProject_157WeaponComponent::Hitscan()
 		AActor* hitActor = HitResult.GetActor();
 		if(!hitActor)
 		{
-			return;						
+			return;
 		}
 		
-		if(IProject_157CharacterInterface* hitActorInterface = Cast<IProject_157CharacterInterface>(hitActor))
-		{
-			IProject_157CharacterInterface::Execute_TakeDamage(hitActor, WeaponCodeData.Damage, FDamageEvent(), nullptr, GetOwner(), HitResult.BoneName);
-		}
-		
+		IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(hitActor);		
+		if(!CharacterInterface)
+			return;
+
+		// Call character interface to damage pawn
+		CharacterInterface->TakeDamage_Implementation(WeaponCodeData.Damage, FDamageEvent(), nullptr, GetOwner(), HitResult.BoneName);		
 	}
 }
 
@@ -226,10 +218,11 @@ FHitResult UProject_157WeaponComponent::CameraTrace_Helper()
 	FVector MuzzleLoc = FVector::ZeroVector;
 	FVector Dir = FVector::ZeroVector;
 	
-	IProject_157CharacterInterface* heroInterface = Cast<IProject_157CharacterInterface>(GetOwner());
+	IProject_157CharacterInterface* heroInterface = Cast<IProject_157CharacterInterface>(GetOwner());	
 	if (heroInterface)
 	{
-		IProject_157CharacterInterface::Execute_OnShoot_Camera(GetOwner(), MuzzleLoc, Dir);
+		
+		heroInterface->OnShoot_Camera_Implementation(MuzzleLoc, Dir);
 	}
 	
 	Dir = MuzzleLoc + Dir * HIGH_NUMBER;

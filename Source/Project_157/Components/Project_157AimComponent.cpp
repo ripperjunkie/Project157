@@ -30,26 +30,43 @@ void UProject_157AimComponent::BeginPlay()
 void UProject_157AimComponent::StartAim()
 {
 	// start aiming	
-	/* Check if character has weapon equipped. */	
-	if(!PlayerRef->CheckState(EProject_157ActionState::ItemEquipped))
+	/* Check if character has weapon equipped. */
+	IProject_157CharacterInterface* characterInterface = Cast<IProject_157CharacterInterface>(GetOwner());
+	
+	if(!characterInterface)
+		return;
+	
+	if(!characterInterface->CheckState_Implementation(EProject_157ActionState::ItemEquipped))
 		return;
 	
 	ToggleAim(true);
-	PlayerRef->SetCurrentState(EProject_157ActionState::Aiming);
-	PlayerRef->ResetState(EProject_157ActionState::Sprinting);
+	characterInterface->SetCurrentState_Implementation(EProject_157ActionState::Aiming);
+	characterInterface->ResetState_Implementation(EProject_157ActionState::Sprinting);
+
+	if(!PlayerRef)
+	{
+		PlayerRef = Cast<AProject_157Player>(GetOwner());
+	}
+	
 	PlayerRef->GetSprintComponent()->StopSprint();
 	PlayerRef->GetCharacterMovement()->MaxWalkSpeed = PlayerRef->GetMovementSettings().AimWalkSpeed;
 }
 
 void UProject_157AimComponent::StopAim()
 {
-	// stop aiming
-	if (PlayerRef->CheckState(EProject_157ActionState::Aiming))
+	IProject_157CharacterInterface* characterInterface = Cast<IProject_157CharacterInterface>(GetOwner());
+	if(!characterInterface)
 	{
-		PlayerRef->ResetState(EProject_157ActionState::Aiming);
+		return;
+	}
+	
+	// stop aiming
+	if (characterInterface->CheckState_Implementation(EProject_157ActionState::Aiming))
+	{
+		characterInterface->ResetState_Implementation(EProject_157ActionState::Aiming);
 		ToggleAim(false);
 		
-		if(!PlayerRef->CheckState(EProject_157ActionState::Crouching))
+		if(!characterInterface->CheckState_Implementation(EProject_157ActionState::Crouching))
 			PlayerRef->GetCharacterMovement()->MaxWalkSpeed = PlayerRef->GetDefaultMovementSettings().MaxWalkSpeed;
 	}
 }

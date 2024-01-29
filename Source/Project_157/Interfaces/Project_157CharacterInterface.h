@@ -39,5 +39,14 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void AddItem(TSubclassOf<UProject_157ItemComponent> ItemToAdd);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool CheckState(EProject_157ActionState stateToCheck);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetCurrentState(EProject_157ActionState state);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ResetState(EProject_157ActionState state);
 	
 };
