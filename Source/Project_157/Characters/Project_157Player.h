@@ -147,7 +147,8 @@ protected:
 	// Traversal actions
 	void Input_Jump();
 	void Input_Sprint();
-	void Input_Crouch();
+	void Input_StartCrouch();
+	void Input_StopCrouch();
 	
 	
 	// Weapon Actions
@@ -233,4 +234,8 @@ protected:
 	FProject_157DefaultMovementSettings DefaultMovementSettings;
 	
 	DebugImGui* Debug_ImGui;
+
+
+	
+
 };

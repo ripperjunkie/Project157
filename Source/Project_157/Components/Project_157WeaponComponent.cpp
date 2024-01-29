@@ -56,14 +56,6 @@ void UProject_157WeaponComponent::Start_UsingItem()
 void UProject_157WeaponComponent::Stop_UsingItem()
 {
 	Super::Stop_UsingItem();
-	
-	IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(GetOwner());
-	if(!CharacterInterface)
-	{
-		return;
-	}
-
-	CharacterInterface->ResetState_Implementation(EProject_157ActionState::Shooting);	
 
 	StopShooting();
 	
@@ -99,8 +91,16 @@ void UProject_157WeaponComponent::StartShooting()
 
 void UProject_157WeaponComponent::StopShooting()
 {
-	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
 	GetWorld()->GetTimerManager().ClearTimer(WeaponCodeData.FireRateTimer);
+
+	IProject_157CharacterInterface* CharacterInterface = Cast<IProject_157CharacterInterface>(GetOwner());
+	if (!CharacterInterface)
+	{
+		return;
+	}
+
+	CharacterInterface->ResetState_Implementation(EProject_157ActionState::Shooting);
+
 }
 
 void UProject_157WeaponComponent::Shoot()

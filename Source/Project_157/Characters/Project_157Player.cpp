@@ -151,7 +151,8 @@ void AProject_157Player::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ThisClass::Input_Reload);
 	PlayerInputComponent->BindAction("ItemCycleUp", IE_Pressed, this, &ThisClass::Input_ItemCycleUp);
 	PlayerInputComponent->BindAction("ItemCycleDown", IE_Pressed, this, &ThisClass::Input_ItemCycleDown);
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ThisClass::Input_Crouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ThisClass::Input_StartCrouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ThisClass::Input_StopCrouch);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ThisClass::Input_Jump);
 	
 }
@@ -244,25 +245,26 @@ void AProject_157Player::Input_Sprint()
 	SprintComponent->StopSprint();
 }
 
-void AProject_157Player::Input_Crouch()
+void AProject_157Player::Input_StartCrouch()
 {
-	// Reset character from crouch mode
-	if(CheckState_Implementation(EProject_157ActionState::Crouching))
-	{		
-		GetCharacterMovement()->UnCrouch();
-		ResetState_Implementation(EProject_157ActionState::Crouching);
-		
-		if(!CheckState_Implementation(EProject_157ActionState::Aiming))
-			GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSettings.MaxWalkSpeed;
-		
-		return;
-	}
-	
 	// Set character to crouch mode	
 	GetCharacterMovement()->Crouch();
 	GetCharacterMovement()->MaxWalkSpeed = MovementSettings.CrouchWalkSpeed;
 	SetCurrentState_Implementation(EProject_157ActionState::Crouching);
 	ResetState_Implementation(EProject_157ActionState::Sprinting);
+}
+
+void AProject_157Player::Input_StopCrouch()
+{
+	// Reset character from crouch mode
+	if (CheckState_Implementation(EProject_157ActionState::Crouching))
+	{
+		GetCharacterMovement()->UnCrouch();
+		ResetState_Implementation(EProject_157ActionState::Crouching);
+
+		if (!CheckState_Implementation(EProject_157ActionState::Aiming))
+			GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSettings.MaxWalkSpeed;
+	}
 }
 
 void AProject_157Player::Input_StartShoot()
@@ -283,8 +285,6 @@ void AProject_157Player::Input_StartShoot()
 
 void AProject_157Player::Input_StopShoot()
 {
-	//UE_LOG(LogProject_157Player, Display, TEXT("%s"), *FString(__FUNCTION__));
-
 	check(InventoryComponent);
 
 	UProject_157ItemComponent* CurrentItem = InventoryComponent->GetCurrentItem();
@@ -445,6 +445,24 @@ void AProject_157Player::OnEnteredVehicle()
 {
 	if (AimComponent)
 		AimComponent->StopAim();
+	
+	if (Debug_GetWeaponComponent())
+	{
+		Debug_GetWeaponComponent()->StopShooting();
+	}
+
+	// Reset character from crouch mode
+	if (CheckState_Implementation(EProject_157ActionState::Crouching))
+	{
+		GetCharacterMovement()->UnCrouch();
+		ResetState_Implementation(EProject_157ActionState::Crouching);
+
+		if (!CheckState_Implementation(EProject_157ActionState::Aiming))
+			GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSettings.MaxWalkSpeed;
+	}
+
+	if (SprintComponent)
+		SprintComponent->StopSprint();
 }
 
 void AProject_157Player::OnExitedVehicle()
