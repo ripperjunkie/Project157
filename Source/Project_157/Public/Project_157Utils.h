@@ -30,6 +30,20 @@ enum class EProject_157ActionState : uint8
 	Reloading = 1 << 7, 
 };
 
+UENUM(BlueprintType)
+enum class EProject_157CharacterConditions : uint8
+{
+	None = 0, // no special actions
+	CanAim = 1 << 0, 
+	CanShoot = 1 << 1,
+	CanPunch = 1 << 2, 
+	Crouching = 1 << 3, 
+	Driving = 1 << 4, 
+	Sprinting = 1 << 5, 
+	ItemEquipped = 1 << 6, 
+	Reloading = 1 << 7, 
+};
+
 // There might be a better way to store each weapon data instead of creating an enum.
 /* State that defines current weapon character is holding */
 UENUM(BlueprintType)
@@ -239,3 +253,10 @@ struct FProject_157BodyPartDamage : public FTableRowBase
 	FName Bone;
 };
 
+// TO TEST
+// template <typename T>
+// static bool _CheckState(T t, uint32& _CurrentActionState)
+// {
+// 	return (_CurrentActionState & static_cast<uint32>(t) ) > (static_cast<uint32>(t) - 1);
+//
+// }

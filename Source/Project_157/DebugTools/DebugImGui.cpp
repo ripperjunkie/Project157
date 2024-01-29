@@ -32,14 +32,13 @@ void DebugImGui::DrawInfo(UObject* Owner)
 	const FString objectName = Owner->GetName();
 	ImGui::Begin( TCHAR_TO_UTF8(*FString("Debug Info: " + objectName) ), nullptr, ImGuiWindowFlags_None);
 	if(IProject_157DebugInfo* debugInfo = Cast<IProject_157DebugInfo>(Owner))
-	{		
-		ImGui::LabelText(TCHAR_TO_UTF8(
-			*FString::SanitizeFloat(debugInfo->Debug_GetCharacterMovementComponent()->MaxWalkSpeed))
-			, "Max Walk speed: ");
-		
-		ImGui::LabelText(TCHAR_TO_UTF8(
-			*FString::SanitizeFloat(debugInfo->Debug_GetCharacterMovementComponent()->Velocity.Size())),
-			"current velocity: ");
+	{
+		// debug Character Movement Component
+		if(ImGui::CollapsingHeader("Character Movement Component"))
+		{
+			ImGui::LabelText(TCHAR_TO_UTF8(	*FString::SanitizeFloat(debugInfo->Debug_GetCharacterMovementComponent()->MaxWalkSpeed)), "Max Walk speed: ");		
+			ImGui::LabelText(TCHAR_TO_UTF8(	*FString::SanitizeFloat(debugInfo->Debug_GetCharacterMovementComponent()->Velocity.Size())),"Current Velocity: ");
+		}
 
 		// debug character states
 		if (ImGui::CollapsingHeader("States"))

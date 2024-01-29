@@ -12,6 +12,8 @@
 
 class AProject_157HeroItem;
 
+DECLARE_LOG_CATEGORY_EXTERN(Log_Project_157ItemComponent, Display, All);
+
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT_157_API UProject_157ItemComponent : public UActorComponent
 {
@@ -40,10 +42,22 @@ public:
 		return bUsingItem;
 	}
 
+	UFUNCTION(BlueprintSetter)
+	void SetCanUseItem(bool _CanUseItem);
+
+	__forceinline bool CanUseItem() const
+	{
+		return bCanUseItem;
+	}
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadOnly)
 	uint8 bUsingItem : 1;
+
+	UPROPERTY(BlueprintReadOnly)
+	uint8 bCanUseItem : 1;
+	
 };

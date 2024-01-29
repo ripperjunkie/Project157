@@ -17,8 +17,6 @@
 #include "Project_157/Components/Project_157AimComponent.h"
 #include "Project_157/Components/Project_157SprintComponent.h"
 
-#include <cmath>
-
 #include "Project_157/DebugTools/DebugImGui.h"
 
 
@@ -77,10 +75,13 @@ AProject_157Player::AProject_157Player(const FObjectInitializer& ObjectInitializ
 void AProject_157Player::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if UE_BUILD_DEVELOPMENT || UE_EDITOR || UE_BUILD_DEBUG
+	Debug_ImGui = new DebugImGui();
+#endif
+	
 	check(SprintComponent);
 	check(AimComponent);
-	
-	ImGui = new DebugImGui();
 
 	PlayerData.DefaultFOV = CameraComponent->FieldOfView;
 	PlayerData.DefaultArmLength = SpringArmComponent->TargetArmLength;
@@ -93,7 +94,12 @@ void AProject_157Player::BeginPlay()
 void AProject_157Player::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	delete ImGui;
+
+#if UE_BUILD_DEVELOPMENT || UE_EDITOR || UE_BUILD_DEBUG
+	delete Debug_ImGui;
+#endif
+
+	
 }
 
 // Called every frame
@@ -113,10 +119,13 @@ void AProject_157Player::Tick(float DeltaTime)
 		}
 	}
 
-	if(ImGui)
+#if UE_BUILD_DEVELOPMENT || UE_EDITOR || UE_BUILD_DEBUG
+	if(Debug_ImGui)
 	{
-		ImGui->DrawInfo(this);
+		Debug_ImGui->DrawInfo(this);
 	}
+#endif
+
 }
 
 
@@ -135,14 +144,16 @@ void AProject_157Player::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ThisClass::Input_Sprint);
 
 	// Weapon actions
-	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &ThisClass::Input_Shoot);
-	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &ThisClass::Input_Shoot);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &ThisClass::Input_StartShoot);
+	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &ThisClass::Input_StopShoot);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, AimComponent, &UProject_157AimComponent::StartAim);	
 	PlayerInputComponent->BindAction("Aim", IE_Released, AimComponent,  &UProject_157AimComponent::StopAim);
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ThisClass::Input_Reload);
 	PlayerInputComponent->BindAction("ItemCycleUp", IE_Pressed, this, &ThisClass::Input_ItemCycleUp);
 	PlayerInputComponent->BindAction("ItemCycleDown", IE_Pressed, this, &ThisClass::Input_ItemCycleDown);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ThisClass::Input_Crouch);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ThisClass::Input_Jump);
+	
 }
 
 
@@ -254,10 +265,9 @@ void AProject_157Player::Input_Crouch()
 	ResetState(EProject_157ActionState::Sprinting);
 }
 
-void AProject_157Player::Input_Shoot()
+void AProject_157Player::Input_StartShoot()
 {
-	// TODO:
-	UE_LOG(LogProject_157Player, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(LogProject_157Player, Display, TEXT("%s"), *FString(__FUNCTION__));
 
 	check(InventoryComponent);
 
@@ -268,7 +278,23 @@ void AProject_157Player::Input_Shoot()
 		return;
 	}
 
-	CurrentItem->IsUsingItem() ? CurrentItem->Stop_UsingItem() : CurrentItem->Start_UsingItem();
+	CurrentItem->Start_UsingItem();
+}
+
+void AProject_157Player::Input_StopShoot()
+{
+	//UE_LOG(LogProject_157Player, Display, TEXT("%s"), *FString(__FUNCTION__));
+
+	check(InventoryComponent);
+
+	UProject_157ItemComponent* CurrentItem = InventoryComponent->GetCurrentItem();
+	if (!CurrentItem)
+	{
+		//UE_LOG(LogProject_157Player, Warning, TEXT("No current item"));
+		return;
+	}
+
+	CurrentItem->Stop_UsingItem();
 }
 
 void AProject_157Player::Input_Reload()
@@ -297,7 +323,6 @@ void AProject_157Player::Input_Reload()
 
 void AProject_157Player::Input_ItemCycleUp()
 {
-	// TODO:
 	check(InventoryComponent);
 	InventoryComponent->StopUsingItemRequest();
 	InventoryComponent->CycleUp();
@@ -305,7 +330,6 @@ void AProject_157Player::Input_ItemCycleUp()
 
 void AProject_157Player::Input_ItemCycleDown()
 {
-	// TODO:
 	check(InventoryComponent);
 	InventoryComponent->StopUsingItemRequest();
 	InventoryComponent->CycleDown();
@@ -383,12 +407,13 @@ float AProject_157Player::GetGroundSpeed_Implementation()
 
 EProject_157ActionState AProject_157Player::GetCharacterState_Implementation()
 {
-	return static_cast<EProject_157ActionState>(std::log2(CurrentActionState));
+	
+	return static_cast<EProject_157ActionState>(FMath::Log2(CurrentActionState));
 }
 
 EProject_157Weapon AProject_157Player::GetCurrentEquippedWeapon_Implementation()
 {
-	return static_cast<EProject_157Weapon>(std::log2(CurrentEquippedWeapon));
+	return static_cast<EProject_157Weapon>(FMath::Log2(CurrentEquippedWeapon));
 }
 
 bool AProject_157Player::GetCheckState_Implementation(EProject_157ActionState State)

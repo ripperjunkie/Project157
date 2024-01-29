@@ -64,6 +64,9 @@ public:
 	 */
 	UPROPERTY()
 	int32 CurrentActionState;
+
+	UPROPERTY()
+	int32 CharacterConditionsStates;
 	
 	UPROPERTY()
 	int32 CurrentEquippedWeapon;
@@ -162,7 +165,8 @@ protected:
 	
 	
 	// Weapon Actions
-	void Input_Shoot();
+	void Input_StartShoot();
+	void Input_StopShoot();
 	void Input_Reload();
 	void Input_ItemCycleUp();
 	void Input_ItemCycleDown();
@@ -238,6 +242,7 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
 	FProject_157DefaultMovementSettings DefaultMovementSettings;
 
-	DebugImGui* ImGui;
+	
+	DebugImGui* Debug_ImGui;
 
 };

@@ -12,8 +12,6 @@
 
 class AProject_157Player;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogCS_WeaponComponent, Display, All);
-
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT_157_API UProject_157WeaponComponent : public UProject_157ItemComponent

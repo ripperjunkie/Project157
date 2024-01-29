@@ -16,16 +16,10 @@ class PROJECT_157_API UProject_157AimComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UProject_157AimComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:
-
+	
 	/* not the best solution to create a direct reference
- * to the player character but let's do this quick solution for now
- */
+	* to the player character but let's do this quick solution for now
+	*/
 	UPROPERTY()
 	AProject_157Player* PlayerRef;
 
@@ -37,4 +31,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleAim(bool aiming);
+
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+	
+private:
+	
+	UPROPERTY()
+	uint8 bCanAim : 1;
 };

@@ -6,7 +6,6 @@
 #include "DrawDebugHelpers.h"
 
 
-DEFINE_LOG_CATEGORY(LogCS_WeaponComponent);
 
 #define HIGH_NUMBER 10000000.f
 
@@ -26,8 +25,8 @@ void UProject_157WeaponComponent::BeginPlay()
 	Super::BeginPlay();
 
 	WeaponCodeData.CurrentAmmo = WeaponCodeData.MaxAmmoPerClip;
-	///UE_LOG(LogCS_WeaponComponent, Display, TEXT("%d"), WeaponCodeData.CurrentAmmo);
-	///UE_LOG(LogCS_WeaponComponent, Display, TEXT("%d"), WeaponCodeData.MaxAmmoPerClip);
+	///UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%d"), WeaponCodeData.CurrentAmmo);
+	///UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%d"), WeaponCodeData.MaxAmmoPerClip);
 
 }
 
@@ -43,7 +42,7 @@ void UProject_157WeaponComponent::Start_UsingItem()
 {
 	Super::Start_UsingItem();
 
-	//UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
+	//UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%s"), *FString(__FUNCTION__));
 
 
 	if (!PlayerRef)
@@ -189,7 +188,7 @@ void UProject_157WeaponComponent::TryReload()
 	// Reload weapon
 	if(WeaponCodeData.CurrentAmmo == WeaponCodeData.MaxAmmoPerClip)
 	{
-		UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s, No need to reload"), *FString(__FUNCTION__));
+		UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%s, No need to reload"), *FString(__FUNCTION__));
 		return;
 	}
 	
@@ -208,11 +207,11 @@ void UProject_157WeaponComponent::TryReload()
 			WeaponCodeData.TotalRemainingAmmo = 0;
 		}
 		WeaponCodeData.CurrentAmmo += x;
-		UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s, reloading"), *FString(__FUNCTION__));
+		UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%s, reloading"), *FString(__FUNCTION__));
 	}
 	else
 	{
-		UE_LOG(LogCS_WeaponComponent, Display, TEXT("%s, No ammo left to reload"), *FString(__FUNCTION__));
+		UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%s, No ammo left to reload"), *FString(__FUNCTION__));
 	}
 }
 
@@ -236,6 +235,6 @@ FHitResult UProject_157WeaponComponent::CameraTrace_Helper()
 	Dir = MuzzleLoc + Dir * HIGH_NUMBER;
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, MuzzleLoc, Dir, CollisionChannel);
-	//UE_LOG(LogTemp, Display, TEXT("%s"), *HitResult.Actor->GetName());
+	//UE_LOG(Log_Project_157ItemComponent, Display, TEXT("%s"), *HitResult.Actor->GetName());
 	return HitResult;
 }

@@ -13,6 +13,12 @@ UProject_157InventoryComponent::UProject_157InventoryComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+// Called when the game starts
+void UProject_157InventoryComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void UProject_157InventoryComponent::StopUsingItemRequest()
 {
 	if (!GetCurrentItem())
@@ -25,11 +31,7 @@ void UProject_157InventoryComponent::StopUsingItemRequest()
 	}
 }
 
-// Called when the game starts
-void UProject_157InventoryComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
+
 
 
 // Helper function to update hero selected weapon
@@ -120,9 +122,6 @@ void UProject_157InventoryComponent::RemoveToInventory(UProject_157ItemComponent
 // Helper function that will check to see if we already have that existing inventory item
 bool UProject_157InventoryComponent::QueryInventoryItem(UProject_157ItemComponent* _ItemToAdd)
 {
-	//int indexFound = 0;
-	//Items.Find(_ItemToAdd, indexFound);
-
 	for (UProject_157ItemComponent*& item : Items)
 	{
 		if(item->GetClass() == _ItemToAdd->GetClass())
@@ -134,16 +133,4 @@ bool UProject_157InventoryComponent::QueryInventoryItem(UProject_157ItemComponen
 	}
 	 UE_LOG(LogTemp, Display, TEXT("%s"), *FString("Item doesn't exist on inventory"));
 	return false;
-
-	
-	// if (indexFound != INDEX_NONE)
-	// {
-	// 	Items[indexFound]->AddingExistingItem();
-	// 	UE_LOG(LogTemp, Display, TEXT("%s"), *FString("Item exists on inventory"));
-	//
-	// 	return true;
-	// }
-	// UE_LOG(LogTemp, Display, TEXT("%s"), *FString("Item doesn't exist on inventory"));
-	//
-	// return false;
 }
