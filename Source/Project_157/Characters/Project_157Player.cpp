@@ -133,6 +133,7 @@ void AProject_157Player::Tick(float DeltaTime)
 void AProject_157Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	check(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ThisClass::Input_MoveForward);
@@ -151,8 +152,7 @@ void AProject_157Player::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ThisClass::Input_Reload);
 	PlayerInputComponent->BindAction("ItemCycleUp", IE_Pressed, this, &ThisClass::Input_ItemCycleUp);
 	PlayerInputComponent->BindAction("ItemCycleDown", IE_Pressed, this, &ThisClass::Input_ItemCycleDown);
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ThisClass::Input_StartCrouch);
-	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ThisClass::Input_StopCrouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ThisClass::Input_ToggleCrouch);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ThisClass::Input_Jump);
 	
 }
@@ -245,26 +245,25 @@ void AProject_157Player::Input_Sprint()
 	SprintComponent->StopSprint();
 }
 
-void AProject_157Player::Input_StartCrouch()
+void AProject_157Player::Input_ToggleCrouch()
 {
 	// Set character to crouch mode	
-	GetCharacterMovement()->Crouch();
-	GetCharacterMovement()->MaxWalkSpeed = MovementSettings.CrouchWalkSpeed;
-	SetCurrentState_Implementation(EProject_157ActionState::Crouching);
-	ResetState_Implementation(EProject_157ActionState::Sprinting);
-}
-
-void AProject_157Player::Input_StopCrouch()
-{
-	// Reset character from crouch mode
-	if (CheckState_Implementation(EProject_157ActionState::Crouching))
+	if (!CheckState_Implementation(EProject_157ActionState::Crouching) && GetCharacterMovement()->IsMovingOnGround())
 	{
-		GetCharacterMovement()->UnCrouch();
-		ResetState_Implementation(EProject_157ActionState::Crouching);
-
-		if (!CheckState_Implementation(EProject_157ActionState::Aiming))
-			GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSettings.MaxWalkSpeed;
+		GetCharacterMovement()->Crouch();
+		GetCharacterMovement()->MaxWalkSpeed = MovementSettings.CrouchWalkSpeed;
+		SetCurrentState_Implementation(EProject_157ActionState::Crouching);
+		ResetState_Implementation(EProject_157ActionState::Sprinting);
+		return;
 	}
+
+	// Reset character from crouch mode
+	GetCharacterMovement()->UnCrouch();
+	ResetState_Implementation(EProject_157ActionState::Crouching);
+
+	if (!CheckState_Implementation(EProject_157ActionState::Aiming))
+		GetCharacterMovement()->MaxWalkSpeed = DefaultMovementSettings.MaxWalkSpeed;
+
 }
 
 void AProject_157Player::Input_StartShoot()

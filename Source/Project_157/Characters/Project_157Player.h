@@ -147,8 +147,7 @@ protected:
 	// Traversal actions
 	void Input_Jump();
 	void Input_Sprint();
-	void Input_StartCrouch();
-	void Input_StopCrouch();
+	void Input_ToggleCrouch();
 	
 	
 	// Weapon Actions

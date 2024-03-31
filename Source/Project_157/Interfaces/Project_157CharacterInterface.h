@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ResetState(EProject_157ActionState state);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PlayFootstepSound();
+
 	
 	virtual void OnEnteredVehicle() = 0;
 	virtual void OnExitedVehicle() = 0;
